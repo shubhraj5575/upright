@@ -1,0 +1,16 @@
+{
+  "name": "Upright — Back-Recovery & Posture",
+  "short_name": "Upright",
+  "description": "A private, local-first companion for back recovery: posture, pain trends, rehab exercises, meals and goals. All data stays on your device.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf8f5",
+  "theme_color": "#2f8273",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

@@ -50,6 +50,13 @@ function boot() {
 
   // Global reminder loop (independent of the active view).
   posture.startReminders();
+
+  // PWA: register the service worker for installability + offline.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
 }
 
 boot();
