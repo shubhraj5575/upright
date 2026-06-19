@@ -50,8 +50,11 @@ const SHELL = [
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_VERSION);
-    // Add resiliently — one missing file shouldn't fail the whole install.
-    await Promise.all(SHELL.map((url) => cache.add(url).catch(() => {})));
+    // {cache:'reload'} bypasses the HTTP cache so a version bump always pulls
+    // FRESH assets — otherwise the SW could re-cache stale files and serve old
+    // code indefinitely. Resilient: one missing file shouldn't fail install.
+    await Promise.all(SHELL.map((url) =>
+      cache.add(new Request(url, { cache: 'reload' })).catch(() => {})));
     self.skipWaiting();
   })());
 });
