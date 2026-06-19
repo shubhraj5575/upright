@@ -7,6 +7,7 @@ import * as store from '../core/store.js';
 import { todayKey } from '../core/dates.js';
 import { el, mount, clear, card, toast } from '../core/ui.js';
 import * as notify from '../core/notify.js';
+import * as postureCamera from './posture-camera.js';
 
 const KEY = 'postureSelfLog';
 const STATE_KEY = 'reminderState'; // transient last-fired times (not exported)
@@ -168,18 +169,22 @@ export function init(mountEl) {
     el('a', { href: '#/settings' }, r.enabled ? 'Adjust in Settings →' : 'Turn on in Settings →')
   );
 
+  const cameraHost = el('div', { style: { marginTop: 'var(--space-4)' } });
+
   mount(mountEl,
     el('div', { class: 'view-header' },
       el('h1', {}, 'Posture'),
       el('p', {}, 'Quick self-check-ins, timed movement-break reminders, and (below) optional camera posture AI.')),
     reminderInfo,
     logCard,
-    todayCard
+    todayCard,
+    cameraHost
   );
   renderList();
 
+  const teardownCamera = postureCamera.mountCamera(cameraHost);
   const unsub = store.subscribe(KEY, renderList);
-  return unsub;
+  return () => { unsub(); teardownCamera(); };
 }
 
 export function getSummary() {

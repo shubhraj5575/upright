@@ -350,3 +350,33 @@
   cursor: pointer;
 }
 .posture-mini button:hover { border-color: var(--color-primary-border); background: var(--color-primary-soft); }
+
+/* --- camera posture AI -------------------------------------------------- */
+.cam-status { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--weight-medium); }
+.cam-status__text { font-size: var(--text-base); }
+.cam-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--color-text-faint);
+  flex: none;
+}
+.cam-dot--good { background: var(--color-primary); box-shadow: 0 0 0 4px var(--color-primary-soft); }
+.cam-dot--poor { background: var(--color-danger); box-shadow: 0 0 0 4px var(--color-danger-soft); }
+.cam-dot--warn { background: var(--color-accent); box-shadow: 0 0 0 4px var(--color-accent-soft); }
+.cam-dot--load { background: var(--color-accent); animation: cam-pulse 1s ease-in-out infinite; }
+.cam-dot--off { background: var(--color-text-faint); }
+@keyframes cam-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.cam-video {
+  position: relative;
+  margin-top: var(--space-3);
+  max-width: 360px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+}
+.cam-video video { width: 100%; height: auto; transform: scaleX(-1); display: block; }
+.cam-badge {
+  position: absolute; bottom: var(--space-2); left: var(--space-2);
+  font-size: var(--text-xs); color: #fff;
+  background: rgba(0,0,0,0.55); padding: 2px var(--space-2); border-radius: var(--radius-full);
+}
