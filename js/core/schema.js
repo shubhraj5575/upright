@@ -84,6 +84,27 @@ export function defaults(createdAt = null) {
   };
 }
 
+/**
+ * Backfill any settings fields a stored settings object is missing (e.g. after
+ * an app update adds a new control). Stored values always win; only absent keys
+ * are filled from defaults. Run on every boot — idempotent.
+ */
+export function mergeSettings(stored) {
+  const d = defaultSettings();
+  const s = stored && typeof stored === 'object' ? stored : {};
+  return {
+    ...d,
+    ...s,
+    reminders: {
+      ...d.reminders,
+      ...(s.reminders || {}),
+      activeHours: { ...d.reminders.activeHours, ...((s.reminders || {}).activeHours || {}) },
+    },
+    goals: { ...d.goals, ...(s.goals || {}) },
+    postureCamera: { ...d.postureCamera, ...(s.postureCamera || {}) },
+  };
+}
+
 /** Default value for a single key (used by store.get fallbacks). */
 export function defaultFor(key) {
   const d = defaults();

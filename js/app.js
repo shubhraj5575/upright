@@ -2,6 +2,7 @@
 // starts the global reminder loop, and starts the router.
 
 import * as store from './core/store.js';
+import { mergeSettings } from './core/schema.js';
 import { el, mount, card, qs } from './core/ui.js';
 import { applyTheme } from './core/theme.js';
 import * as router from './router.js';
@@ -23,7 +24,9 @@ function boot() {
     console.info('[Upright] First run — seeded default data.');
   }
 
-  // Apply saved theme before first paint of any view.
+  // Backfill any settings fields added since this device's data was created,
+  // then apply the saved theme before first paint of any view.
+  store.update('settings', (s) => mergeSettings(s));
   applyTheme((store.get('settings') || {}).theme || 'system');
 
   // Feature modules (init/getSummary contract).
