@@ -1,0 +1,4 @@
+# Dev/local-only files not needed by the deployed web app
+.claude
+start.command
+.gitignore
