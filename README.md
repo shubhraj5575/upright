@@ -4,7 +4,7 @@ A private, **local-first** web app to support recovery from a lower-back injury.
 Everything runs in your browser; all data stays on your device. No login, no
 server, no accounts. Works offline and can be installed as an app.
 
-**Live:** <https://tech1onegroup.github.io/upright/> (auto-deploys from `main`
+**Live:** <https://shubhraj5575.github.io/upright/> (auto-deploys from `main`
 via GitHub Pages). Only the app code is hosted — your logs never leave your
 browser.
 
