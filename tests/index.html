@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upright — tests</title>
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <style>
+    body { max-width: 760px; margin: 0 auto; padding: 2rem 1rem; }
+    .result { display: flex; gap: .5rem; padding: .35rem .5rem; border-radius: var(--radius-sm); font-size: var(--text-sm); }
+    .result + .result { border-top: 1px solid var(--color-border); }
+    .pass { color: var(--color-primary); }
+    .fail { background: var(--color-danger-soft); color: var(--color-danger); }
+    .detail { font-family: var(--font-mono); font-size: var(--text-xs); white-space: pre-wrap; opacity: .85; }
+    .suite-title { margin: 1.5rem 0 .5rem; }
+    .summary { font-size: var(--text-lg); font-weight: 600; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Upright — pure-logic tests</h1>
+  <p class="text-muted">No build step. These assert the date/streak math and backup round-trip in the browser.
+  The same files also run headless via <code>node tests/dates.test.js</code> and <code>node tests/backup.test.js</code>.</p>
+  <div id="out"></div>
+
+  <script type="module">
+    import datesSuite from './dates.test.js';
+    import backupSuite from './backup.test.js';
+
+    const out = document.getElementById('out');
+    const suites = [datesSuite, backupSuite];
+    let total = 0, failed = 0;
+
+    for (const s of suites) {
+      const h = document.createElement('h2');
+      h.className = 'suite-title';
+      h.textContent = s.name;
+      out.appendChild(h);
+      for (const r of s.results) {
+        total++;
+        if (!r.ok) failed++;
+        const row = document.createElement('div');
+        row.className = 'result ' + (r.ok ? 'pass' : 'fail');
+        const tag = document.createElement('strong');
+        tag.textContent = r.ok ? 'PASS' : 'FAIL';
+        const label = document.createElement('span');
+        label.textContent = r.label;
+        row.append(tag, label);
+        if (r.detail) {
+          const d = document.createElement('div');
+          d.className = 'detail';
+          d.textContent = r.detail;
+          row.appendChild(d);
+        }
+        out.appendChild(row);
+      }
+    }
+
+    const summary = document.createElement('div');
+    summary.className = 'summary ' + (failed ? 'fail' : 'pass');
+    summary.textContent = `${total - failed}/${total} passed.`;
+    out.appendChild(summary);
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+
+# Editor
+.vscode/
+*.swp
+
+# Vendored binaries are intentionally committed (offline-first); nothing to ignore there.

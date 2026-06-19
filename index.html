@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upright</title>
+  <meta name="description" content="A private, local-first companion for back recovery and posture." />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#2f8273" />
+
+  <!-- Design tokens first, then base, components, layout (cascade order matters). -->
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/app.css" />
+</head>
+<body>
+  <a class="skip-link" href="#app">Skip to content</a>
+
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="#/dashboard" aria-label="Upright home">
+        <span class="brand__mark" aria-hidden="true">↑</span>
+        <span>Upright</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary">
+        <a href="#/dashboard">Dashboard</a>
+        <a href="#/pain">Pain</a>
+        <a href="#/goals">Goals</a>
+        <a href="#/posture">Posture</a>
+        <a href="#/exercises">Exercises</a>
+        <a href="#/meal-plan">Meal plan</a>
+        <a href="#/meals">Meals</a>
+        <a href="#/ergo">Ergonomics</a>
+        <a href="#/settings">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Router renders the active view into this element. -->
+  <main id="app" class="app-main" tabindex="-1"></main>
+
+  <footer class="app-footer">
+    Upright is a wellness tool, not medical advice. It complements your physiotherapist's plan —
+    it does not replace it. <a href="#/settings">Disclaimer &amp; safety →</a>
+  </footer>
+
+  <!-- aria-live region for toast notifications (also the reminder fallback). -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
