@@ -39,6 +39,8 @@ export const KIND = {
 /** Default settings — referenced by modules so config has stable shape. */
 export function defaultSettings() {
   return {
+    theme: 'system', // 'system' | 'light' | 'dark'
+    streakGrace: 1, // missed days forgiven before a streak breaks
     reminders: {
       enabled: false,
       postureIntervalMin: 30, // sit-check cadence

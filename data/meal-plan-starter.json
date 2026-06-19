@@ -1,0 +1,75 @@
+{
+  "tagLegend": [
+    { "id": "anti-inflammatory", "label": "Anti-inflammatory" },
+    { "id": "high-protein", "label": "High protein" },
+    { "id": "calcium", "label": "Calcium" },
+    { "id": "vit-d", "label": "Vitamin D" },
+    { "id": "omega-3", "label": "Omega-3" },
+    { "id": "fiber", "label": "Fiber" }
+  ],
+  "days": [
+    {
+      "day": "Mon",
+      "meals": {
+        "breakfast": { "name": "Greek yogurt with blueberries, walnuts & ground flax", "tags": ["high-protein", "calcium", "omega-3"] },
+        "lunch": { "name": "Salmon & quinoa bowl with spinach and olive oil", "tags": ["omega-3", "anti-inflammatory", "high-protein"] },
+        "dinner": { "name": "Turmeric-ginger lentil dahl with brown rice", "tags": ["anti-inflammatory", "fiber", "high-protein"] },
+        "snack": { "name": "Almonds and an orange", "tags": ["fiber", "calcium"] }
+      }
+    },
+    {
+      "day": "Tue",
+      "meals": {
+        "breakfast": { "name": "Veggie omelette with kale and a glass of fortified milk", "tags": ["high-protein", "vit-d", "calcium"] },
+        "lunch": { "name": "Sardine & avocado wholegrain toast with rocket", "tags": ["omega-3", "anti-inflammatory", "fiber"] },
+        "dinner": { "name": "Baked chicken with roasted broccoli and sweet potato", "tags": ["high-protein", "anti-inflammatory", "fiber"] },
+        "snack": { "name": "Greek yogurt with honey and pumpkin seeds", "tags": ["high-protein", "calcium"] }
+      }
+    },
+    {
+      "day": "Wed",
+      "meals": {
+        "breakfast": { "name": "Overnight oats with chia, berries and almond butter", "tags": ["fiber", "omega-3", "anti-inflammatory"] },
+        "lunch": { "name": "Chickpea & roasted vegetable salad with tahini", "tags": ["fiber", "high-protein", "anti-inflammatory"] },
+        "dinner": { "name": "Grilled mackerel with leafy greens and olive oil", "tags": ["omega-3", "vit-d", "anti-inflammatory"] },
+        "snack": { "name": "Cottage cheese with sliced strawberries", "tags": ["high-protein", "calcium"] }
+      }
+    },
+    {
+      "day": "Thu",
+      "meals": {
+        "breakfast": { "name": "Smoothie: spinach, Greek yogurt, banana and ginger", "tags": ["anti-inflammatory", "calcium", "high-protein"] },
+        "lunch": { "name": "Tuna & white bean salad with parsley and lemon", "tags": ["omega-3", "high-protein", "fiber"] },
+        "dinner": { "name": "Tofu & vegetable stir-fry with turmeric and brown rice", "tags": ["high-protein", "anti-inflammatory", "fiber"] },
+        "snack": { "name": "Handful of walnuts and a kiwi", "tags": ["omega-3", "fiber"] }
+      }
+    },
+    {
+      "day": "Fri",
+      "meals": {
+        "breakfast": { "name": "Scrambled eggs with smoked salmon and wholegrain toast", "tags": ["high-protein", "omega-3", "vit-d"] },
+        "lunch": { "name": "Lentil & kale soup with a wholegrain roll", "tags": ["fiber", "anti-inflammatory", "high-protein"] },
+        "dinner": { "name": "Baked trout with quinoa and steamed greens", "tags": ["omega-3", "high-protein", "anti-inflammatory"] },
+        "snack": { "name": "Fortified yogurt with mixed berries", "tags": ["vit-d", "calcium", "anti-inflammatory"] }
+      }
+    },
+    {
+      "day": "Sat",
+      "meals": {
+        "breakfast": { "name": "Chia pudding with almond milk, mango and pistachios", "tags": ["omega-3", "fiber", "calcium"] },
+        "lunch": { "name": "Falafel & hummus bowl with tomato, cucumber and olive oil", "tags": ["fiber", "anti-inflammatory", "high-protein"] },
+        "dinner": { "name": "Salmon traybake with peppers, broccoli and turmeric", "tags": ["omega-3", "anti-inflammatory", "vit-d"] },
+        "snack": { "name": "Edamame with sea salt", "tags": ["high-protein", "fiber"] }
+      }
+    },
+    {
+      "day": "Sun",
+      "meals": {
+        "breakfast": { "name": "Wholegrain pancakes with Greek yogurt and raspberries", "tags": ["high-protein", "calcium", "fiber"] },
+        "lunch": { "name": "Roasted vegetable & egg frittata with side salad", "tags": ["high-protein", "vit-d", "anti-inflammatory"] },
+        "dinner": { "name": "Ginger-turmeric chickpea curry with spinach and brown rice", "tags": ["anti-inflammatory", "fiber", "high-protein"] },
+        "snack": { "name": "Dark chocolate square with almonds", "tags": ["anti-inflammatory", "fiber"] }
+      }
+    }
+  ]
+}

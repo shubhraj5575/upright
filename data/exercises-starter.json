@@ -1,0 +1,104 @@
+[
+  {
+    "id": "cat-cow",
+    "name": "Cat-Cow",
+    "category": "Mobility",
+    "instructions": [
+      "Start on all fours, hands under shoulders and knees under hips.",
+      "Breathe out and gently round your spine, tucking your chin (cat).",
+      "Breathe in and slowly let your belly drop, lifting your chest and gaze (cow).",
+      "Move smoothly within a comfortable, pain-free range."
+    ],
+    "cue": "Move slowly with your breath — no forcing the end range.",
+    "defaultSets": 1,
+    "defaultReps": 10,
+    "holdSec": 0,
+    "restSec": 20,
+    "demoSvg": "<svg viewBox=\"0 0 120 80\" width=\"120\" height=\"80\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 55 Q60 30 100 55\"/><line x1=\"28\" y1=\"55\" x2=\"28\" y2=\"72\"/><line x1=\"92\" y1=\"55\" x2=\"92\" y2=\"72\"/><line x1=\"100\" y1=\"55\" x2=\"108\" y2=\"45\"/></svg>"
+  },
+  {
+    "id": "bird-dog",
+    "name": "Bird-Dog",
+    "category": "Core",
+    "instructions": [
+      "On all fours, brace your core gently and keep your back flat.",
+      "Reach one arm forward and the opposite leg straight back.",
+      "Keep your hips level — don’t let them twist or sag.",
+      "Lower with control and switch sides."
+    ],
+    "cue": "Keep your spine still — move only the limbs.",
+    "defaultSets": 2,
+    "defaultReps": 8,
+    "holdSec": 0,
+    "restSec": 30,
+    "demoSvg": "<svg viewBox=\"0 0 120 80\" width=\"120\" height=\"80\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"35\" y1=\"45\" x2=\"85\" y2=\"45\"/><line x1=\"35\" y1=\"45\" x2=\"35\" y2=\"65\"/><line x1=\"85\" y1=\"45\" x2=\"85\" y2=\"65\"/><line x1=\"35\" y1=\"45\" x2=\"12\" y2=\"32\"/><line x1=\"85\" y1=\"45\" x2=\"108\" y2=\"58\"/><circle cx=\"30\" cy=\"40\" r=\"5\"/></svg>"
+  },
+  {
+    "id": "glute-bridge",
+    "name": "Glute Bridge",
+    "category": "Glutes",
+    "instructions": [
+      "Lie on your back, knees bent, feet flat and hip-width apart.",
+      "Tighten your glutes and press through your heels to lift your hips.",
+      "Raise until your body forms a straight line from knees to shoulders.",
+      "Lower slowly without arching your lower back."
+    ],
+    "cue": "Drive through the heels and squeeze the glutes, not the back.",
+    "defaultSets": 2,
+    "defaultReps": 10,
+    "holdSec": 0,
+    "restSec": 30,
+    "demoSvg": "<svg viewBox=\"0 0 120 80\" width=\"120\" height=\"80\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 62 L48 40 L70 62\"/><line x1=\"70\" y1=\"62\" x2=\"100\" y2=\"62\"/><circle cx=\"104\" cy=\"58\" r=\"5\"/><line x1=\"18\" y1=\"62\" x2=\"18\" y2=\"72\"/></svg>"
+  },
+  {
+    "id": "mcgill-curl-up",
+    "name": "McGill Curl-up",
+    "category": "Core",
+    "instructions": [
+      "Lie on your back with one knee bent, the other leg straight.",
+      "Place your hands under your lower back to keep its natural curve.",
+      "Lift your head and shoulders just a little off the floor.",
+      "Hold briefly, then lower with control. Don’t flatten your back."
+    ],
+    "cue": "Tiny lift — chin neutral, no crunching the neck.",
+    "defaultSets": 2,
+    "defaultReps": 0,
+    "holdSec": 8,
+    "restSec": 20,
+    "demoSvg": "<svg viewBox=\"0 0 120 80\" width=\"120\" height=\"80\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"20\" y1=\"62\" x2=\"100\" y2=\"62\"/><circle cx=\"32\" cy=\"52\" r=\"5\"/><path d=\"M37 55 L60 58 L72 44 L84 58\"/></svg>"
+  },
+  {
+    "id": "side-plank",
+    "name": "Side Plank",
+    "category": "Core",
+    "instructions": [
+      "Lie on your side, forearm under your shoulder, knees bent.",
+      "Lift your hips so your body forms a straight line.",
+      "Keep your neck long and breathe steadily through the hold.",
+      "Start from the knees and progress slowly as you get stronger."
+    ],
+    "cue": "Stack the shoulder over the elbow; keep hips lifted and level.",
+    "defaultSets": 2,
+    "defaultReps": 0,
+    "holdSec": 15,
+    "restSec": 30,
+    "demoSvg": "<svg viewBox=\"0 0 120 80\" width=\"120\" height=\"80\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"22\" y1=\"62\" x2=\"100\" y2=\"40\"/><line x1=\"30\" y1=\"60\" x2=\"30\" y2=\"72\"/><circle cx=\"104\" cy=\"36\" r=\"5\"/></svg>"
+  },
+  {
+    "id": "dead-bug",
+    "name": "Dead Bug",
+    "category": "Core",
+    "instructions": [
+      "Lie on your back, arms reaching up, knees bent over your hips.",
+      "Gently flatten your lower back toward the floor and brace.",
+      "Slowly lower one arm and the opposite leg toward the floor.",
+      "Return with control and alternate sides, keeping your back steady."
+    ],
+    "cue": "Keep the lower back quiet — move only as far as you can control.",
+    "defaultSets": 2,
+    "defaultReps": 8,
+    "holdSec": 0,
+    "restSec": 30,
+    "demoSvg": "<svg viewBox=\"0 0 120 80\" width=\"120\" height=\"80\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"20\" y1=\"58\" x2=\"100\" y2=\"58\"/><circle cx=\"28\" cy=\"52\" r=\"5\"/><line x1=\"50\" y1=\"58\" x2=\"58\" y2=\"38\"/><line x1=\"50\" y1=\"58\" x2=\"42\" y2=\"38\"/><line x1=\"74\" y1=\"58\" x2=\"82\" y2=\"40\"/><line x1=\"74\" y1=\"58\" x2=\"66\" y2=\"40\"/></svg>"
+  }
+]
