@@ -14,6 +14,7 @@ import * as ergo from './modules/ergo-sleep-guide.js';
 import * as exercises from './modules/exercises.js';
 import * as mealPlan from './modules/meal-plan.js';
 import * as mealLog from './modules/meal-log.js';
+import * as report from './modules/report.js';
 
 function boot() {
   const seeded = store.ensureSeeded();
@@ -34,6 +35,7 @@ function boot() {
   router.register('meal-plan', mealPlan.init, 'Meal plan');
   router.register('meals', mealLog.init, 'Meal log');
   router.register('ergo', ergo.init, 'Ergonomics & sleep');
+  router.register('report', report.init, 'Physio report');
   router.register('settings', settings.init, 'Settings');
 
   router.setDefault('dashboard');

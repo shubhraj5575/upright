@@ -8,6 +8,8 @@ import { el, mount, clear, card, statTile, toast } from '../core/ui.js';
 import * as pain from './pain-trends.js';
 import * as goals from './goals.js';
 import * as posture from './posture-reminders.js';
+import * as exercises from './exercises.js';
+import * as mealLog from './meal-log.js';
 
 function hasAnyHistory() {
   const nonEmpty = (k) => {
@@ -38,6 +40,11 @@ function activeDayKeys(days = 120) {
 
 function fmtL(ml) {
   return `${(ml / 1000).toFixed(ml % 1000 ? 1 : 0)}L`;
+}
+
+// getSummary() defensively — a module shouldn't be able to break the dashboard.
+function safeSummary(mod) {
+  try { return (mod.getSummary && mod.getSummary()) || {}; } catch (_) { return {}; }
 }
 
 export function init(mountEl) {
@@ -82,7 +89,10 @@ export function init(mountEl) {
     const p = pain.getSummary();
     const g = goals.getSummary();
     const po = posture.getSummary();
-    const streak = computeStreak(activeDayKeys(), todayKey());
+    const ex = safeSummary(exercises);
+    const ml = safeSummary(mealLog);
+    const grace = (store.get('settings') || {}).streakGrace ?? 1;
+    const streak = computeStreak(activeDayKeys(), todayKey(), { grace });
 
     if (!hasAnyHistory()) {
       mount(host, card('Welcome to Upright 👋',
@@ -124,6 +134,17 @@ export function init(mountEl) {
         value: g.steps.toLocaleString(),
         sub: `${g.stepPct}% of ${g.stepGoal.toLocaleString()}`,
         accent: g.stepPct >= 100 ? 'var(--color-primary)' : null,
+      }),
+      statTile({
+        icon: '🧘', label: 'Exercises today', href: '#/exercises',
+        value: String(ex.doneToday || 0),
+        sub: ex.doneToday ? `of ${ex.total} in library` : 'None done yet',
+        accent: ex.doneToday > 0 ? 'var(--color-primary)' : null,
+      }),
+      statTile({
+        icon: '🍽️', label: 'Meals logged', href: '#/meals',
+        value: String(ml.countToday || 0),
+        sub: ml.countToday ? 'today' : 'None logged today',
       })
     );
     mount(host, tiles);

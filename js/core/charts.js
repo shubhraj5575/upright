@@ -54,14 +54,14 @@ export function lineChart(opts) {
   const xAt = (i) => padL + (n === 1 ? plotW / 2 : (i * plotW) / (n - 1));
   const yAt = (v) => padT + plotH * (1 - (v - yMin) / (yMax - yMin || 1));
 
+  // width:100% + intrinsic viewBox ratio (no fixed pixel height, default
+  // preserveAspectRatio) → uniform scaling, so dots stay round at any width.
   const svg = svgEl('svg', {
     viewBox: `0 0 ${W} ${H}`,
     width: '100%',
-    height: H,
     role: 'img',
     'aria-label': ariaLabel,
     class: 'chart chart--line',
-    preserveAspectRatio: 'none',
   });
 
   // horizontal gridlines + y labels
@@ -159,7 +159,7 @@ export function barChart(opts) {
   const barW = Math.min(slot * 0.6, 48);
 
   const svg = svgEl('svg', {
-    viewBox: `0 0 ${W} ${H}`, width: '100%', height: H,
+    viewBox: `0 0 ${W} ${H}`, width: '100%',
     role: 'img', 'aria-label': ariaLabel, class: 'chart chart--bar',
   });
 
