@@ -6,13 +6,13 @@ import * as store from './core/store.js';
 import * as backup from './core/backup.js';
 import { el, mount, clear, card, toast, qs } from './core/ui.js';
 import * as router from './router.js';
+import * as dashboard from './modules/dashboard.js';
+import * as painTrends from './modules/pain-trends.js';
+import * as goals from './modules/goals.js';
+import * as posture from './modules/posture-reminders.js';
 
 // --- placeholder views (real modules land in later phases) ----------------
 const PLACEHOLDERS = {
-  dashboard: { title: 'Dashboard', phase: 1, blurb: 'Your day at a glance — pain, posture, movement, water and streaks, with quick-log buttons.' },
-  pain: { title: 'Pain & symptoms', phase: 1, blurb: 'Daily pain / stiffness sliders and trend charts with a 7-day rolling average.' },
-  goals: { title: 'Walk & water goals', phase: 1, blurb: 'Progress rings, quick water/step entry, and streak badges.' },
-  posture: { title: 'Posture', phase: 1, blurb: 'Movement-break reminders, a 1-tap posture self-log, and (later) optional camera posture AI.' },
   exercises: { title: 'Rehab exercises', phase: 3, blurb: 'Your physio exercises with timers, sets/reps, demos and "done today" tracking.' },
   'meal-plan': { title: 'Meal plan', phase: 3, blurb: 'A curated anti-inflammatory starter plan you can customize and reset.' },
   meals: { title: 'Meal log', phase: 3, blurb: 'Quick-add meals with dietary tags and a simple weekly summary.' },
@@ -131,6 +131,13 @@ function boot() {
   for (const [path, meta] of Object.entries(PLACEHOLDERS)) {
     router.register(path, placeholderView(meta), meta.title);
   }
+
+  // Phase 1 — real feature modules.
+  router.register('dashboard', dashboard.init, 'Dashboard');
+  router.register('pain', painTrends.init, 'Pain & symptoms');
+  router.register('goals', goals.init, 'Walk & water');
+  router.register('posture', posture.init, 'Posture');
+
   router.register('settings', settingsView, 'Settings');
 
   router.setDefault('dashboard');

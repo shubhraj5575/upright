@@ -109,3 +109,49 @@ export function toast(message, opts = {}) {
 export function card(title, ...children) {
   return el('section', { class: 'card' }, title ? el('h2', { class: 'card__title' }, title) : null, ...children);
 }
+
+/**
+ * Labelled range slider with a live value read-out.
+ * @param {{ id?:string, label:string, min:number, max:number, step?:number,
+ *           value:number, format?:(v:number)=>string, onInput?:(v:number)=>void }} opts
+ * @returns {{ field:HTMLElement, input:HTMLInputElement, get:()=>number }}
+ */
+export function slider(opts) {
+  const { id, label, min, max, step = 1, value, format = (v) => v, onInput } = opts;
+  const out = el('output', { class: 'slider__value' }, String(format(value)));
+  const input = el('input', {
+    class: 'slider', type: 'range', min, max, step, value, id,
+    'aria-label': label,
+    onInput: (e) => {
+      const v = Number(e.target.value);
+      out.textContent = String(format(v));
+      if (onInput) onInput(v);
+    },
+  });
+  const field = el('div', { class: 'field slider-field' },
+    el('div', { class: 'row row--between' },
+      el('label', { for: id }, label),
+      out
+    ),
+    input
+  );
+  return { field, input, get: () => Number(input.value) };
+}
+
+/**
+ * Compact stat tile for the dashboard. Clickable if onClick is provided.
+ * @param {{ label:string, value:string, sub?:string, accent?:string,
+ *           icon?:string, onClick?:Function, href?:string }} opts
+ */
+export function statTile(opts) {
+  const { label, value, sub, accent, icon, onClick, href } = opts;
+  const body = [
+    icon ? el('div', { class: 'tile__icon', 'aria-hidden': 'true' }, icon) : null,
+    el('div', { class: 'tile__value', style: accent ? { color: accent } : null }, value),
+    el('div', { class: 'tile__label' }, label),
+    sub ? el('div', { class: 'tile__sub' }, sub) : null,
+  ];
+  if (href) return el('a', { class: 'tile tile--link', href }, ...body);
+  if (onClick) return el('button', { class: 'tile tile--link', onClick }, ...body);
+  return el('div', { class: 'tile' }, ...body);
+}

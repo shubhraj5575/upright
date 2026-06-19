@@ -12,6 +12,7 @@ let defaultPath = 'dashboard';
 let mountEl = null;
 let navEl = null;
 let started = false;
+let currentCleanup = null; // teardown returned by the active view's init()
 
 /** Register a route. `init(mountEl)` renders the view into the mount element. */
 export function register(path, init, title) {
@@ -52,13 +53,22 @@ function updateNav(path) {
 function render() {
   const path = currentPath();
   const route = routes.get(path);
+
+  // Tear down the previous view (unsubscribe store listeners, clear timers)
+  // before swapping, so repeated navigation can't leak subscriptions.
+  if (typeof currentCleanup === 'function') {
+    try { currentCleanup(); } catch (_) { /* ignore */ }
+  }
+  currentCleanup = null;
+
   clear(mountEl);
   mountEl.scrollTop = 0;
 
   if (route) {
     document.title = `${route.title} · Upright`;
     try {
-      route.init(mountEl);
+      const teardown = route.init(mountEl);
+      if (typeof teardown === 'function') currentCleanup = teardown;
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(`[router] route "${path}" failed to render:`, err);
