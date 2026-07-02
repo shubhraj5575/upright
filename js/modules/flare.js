@@ -12,6 +12,7 @@ import {
   activeFlare, startFlare, endFlare, activeFlareDays, flareHistoryStats,
   RED_FLAG_TITLE, RED_FLAG_BODY,
 } from '../core/flare.js';
+import { breathingLauncher } from './breathing.js';
 
 const KEY = 'flareLog';
 
@@ -26,6 +27,9 @@ function guidanceCard() {
       el('li', {}, 'Keep moving gently within comfort: short walks beat bed rest for most backs.'),
       el('li', {}, 'Your daily goals are reduced automatically — meeting the smaller target still counts.'),
       el('li', {}, 'Follow the flare advice your physiotherapist gave you. If in doubt, ask them.')),
+    el('div', { style: { marginTop: 'var(--space-4)' } },
+      el('p', { style: { fontWeight: 'var(--weight-medium)', marginBottom: 'var(--space-2)' } }, 'Two minutes of slow breathing helps more than it sounds like it should:'),
+      breathingLauncher()),
     el('div', { class: 'callout callout--warn', style: { marginTop: 'var(--space-4)' } },
       el('div', { class: 'callout__title' }, `⚠ ${RED_FLAG_TITLE}`),
       el('p', {}, RED_FLAG_BODY))

@@ -69,25 +69,65 @@ export function withinActiveHours(now, r) {
 }
 
 function tick() {
+  const now = new Date();
+  medTick(now); // med reminders run on their own enable (times set = enabled)
+
   const r = reminderCfg();
   if (!r.enabled) return;
-  const now = new Date();
   if (!withinActiveHours(now, r)) return;
   const nowMs = now.getTime();
   const st = getState();
 
-  const check = (field, intervalMin, title, body) => {
+  const check = (field, intervalMin, title, body, opts = {}) => {
     if (!intervalMin || intervalMin <= 0) return;
     const last = st[field] ? new Date(st[field]).getTime() : 0;
     if (!last) { setLast(field, now.toISOString()); return; } // seed, don't fire instantly
     if (nowMs - last >= intervalMin * 60000) {
-      notify.fire(title, { body, type: 'warn', onClick: () => { location.hash = '#/posture'; } });
+      notify.fire(title, { body, type: 'warn', ...opts });
       setLast(field, now.toISOString());
     }
   };
 
-  check('lastPostureAt', r.postureIntervalMin, '🪑 Posture check', 'Sit tall — relax your shoulders and ease your lower back.');
-  check('lastMovementAt', r.movementIntervalMin, '🚶 Movement break', 'Stand up and move for a minute to unload your back.');
+  check('lastPostureAt', r.postureIntervalMin, '🪑 Posture check', 'Sit tall — relax your shoulders and ease your lower back.',
+    { onClick: () => { location.hash = '#/posture'; } });
+  check('lastMovementAt', r.movementIntervalMin, '🚶 Movement break', 'Stand up and move for a minute to unload your back.',
+    {
+      actionLabel: 'I moved',
+      onClick: async () => {
+        // Lazy import avoids a static cycle (goals ↔ reminders via dashboard).
+        const goals = await import('./goals.js');
+        goals.logBreak();
+        toast('Break logged — good.', { type: 'success', duration: 1500 });
+      },
+    });
+}
+
+/** Daily medication reminders at fixed times (settings.meds.reminderTimes). */
+function medTick(now) {
+  const times = ((store.get('settings') || {}).meds || {}).reminderTimes || [];
+  if (!times.length) return;
+  const today = todayKey();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const st = getState();
+  const fired = (st.medFired && st.medFired.day === today) ? st.medFired.times : [];
+  for (const t of times) {
+    if (fired.includes(t)) continue;
+    const [h, m] = String(t).split(':').map(Number);
+    if (Number.isNaN(h)) continue;
+    // Fire within a 10-minute window after the set time (the 30s heartbeat
+    // may be paused while the tab is closed; don't fire hours late).
+    const at = h * 60 + m;
+    if (mins >= at && mins <= at + 10) {
+      notify.fire('💊 Medication reminder', {
+        body: 'Time for your scheduled medication/supplement — log it in Wellbeing.',
+        onClick: () => { location.hash = '#/wellbeing'; },
+      });
+      store.update(STATE_KEY, (s) => {
+        const cur = (s && s.medFired && s.medFired.day === today) ? s.medFired.times : [];
+        return { ...(s || {}), medFired: { day: today, times: [...cur, t] } };
+      });
+    }
+  }
 }
 
 /** Start the global reminder loop. Safe to call once at boot. */

@@ -7,8 +7,11 @@ import { el, mount, clear, card, toast, pageHeader, celebrate, setFieldError } f
 import { icon } from '../core/icons.js';
 import { progressRing, barChart } from '../core/charts.js';
 import { activeFlare, adjustedGoals } from '../core/flare.js';
+import { summarizeDay } from './cam-session.js';
 
 const KEY = 'goalsLog';
+const ACT_KEY = 'activityLog';
+const BREAK_TARGET_MIN = 45; // aim: one break per 45 min of sitting
 
 function goalsCfg() {
   const s = store.get('settings') || {};
@@ -53,6 +56,42 @@ export function addSteps(n) {
 /** The configured goals, for the dashboard's quick-log step size. */
 export function config() {
   return goalsCfg();
+}
+
+// --- sitting / breaks balance -------------------------------------------------
+// Manual estimates, with the camera as an honest floor when it ran today:
+// monitored time IS desk time, and away-detections are real breaks.
+
+function activityToday() {
+  const a = (store.get(ACT_KEY) || {})[todayKey()] || {};
+  return { sittingMin: a.sittingMin || 0, breaks: a.breaks || 0 };
+}
+
+function patchActivity(mutator) {
+  const k = todayKey();
+  store.update(ACT_KEY, (all) => {
+    const cur = { sittingMin: 0, breaks: 0, ...((all || {})[k] || {}) };
+    mutator(cur);
+    cur.sittingMin = Math.max(0, Math.min(18 * 60, cur.sittingMin));
+    cur.breaks = Math.max(0, Math.min(60, cur.breaks));
+    return { ...(all || {}), [k]: cur };
+  });
+}
+
+/** Exported so the movement-break reminder's "I moved" action can log a break. */
+export function logBreak() {
+  patchActivity((a) => { a.breaks += 1; });
+}
+
+/** Effective sitting picture for today (manual + camera floor). */
+export function sittingBalance() {
+  const manual = activityToday();
+  const camDay = (store.get('postureCamLog') || {})[todayKey()];
+  const cam = camDay ? summarizeDay(camDay) : null;
+  const sittingMin = Math.max(manual.sittingMin, cam ? cam.monitoredMin : 0);
+  const breaks = manual.breaks + (cam ? cam.awayCount : 0);
+  const targetBreaks = Math.floor(sittingMin / BREAK_TARGET_MIN);
+  return { sittingMin, breaks, targetBreaks, camFloor: !!cam && cam.monitoredMin > manual.sittingMin, camBreaks: cam ? cam.awayCount : 0 };
 }
 
 /** Day keys (within `days`) where the given goal was met. */
@@ -166,7 +205,29 @@ export function init(mountEl) {
       )
     );
 
-    mount(host, todayCard, weeklyCard);
+    // --- sitting balance ---
+    const bal = sittingBalance();
+    const balanceMsg = bal.sittingMin === 0
+      ? 'Estimate your desk time with one tap — breaks matter as much as steps for a recovering back.'
+      : bal.breaks >= bal.targetBreaks
+        ? `${bal.breaks} break${bal.breaks === 1 ? '' : 's'} over ~${(bal.sittingMin / 60).toFixed(1)}h of sitting — on target (aim: one per ${BREAK_TARGET_MIN} min).`
+        : `${bal.breaks} break${bal.breaks === 1 ? '' : 's'} over ~${(bal.sittingMin / 60).toFixed(1)}h of sitting — aim for ${bal.targetBreaks} (one per ${BREAK_TARGET_MIN} min).`;
+    const sittingCard = card('Sitting & breaks',
+      el('p', { class: 'card__subtitle' }, balanceMsg),
+      el('div', { class: 'row', style: { marginBottom: 'var(--space-3)' } },
+        el('span', { class: 'text-muted', style: { fontSize: 'var(--text-sm)' } }, 'Sat today:'),
+        ...[2, 4, 6, 8].map((h) => el('button', {
+          class: 'btn btn--sm' + (Math.round(bal.sittingMin / 60) === h ? ' btn--primary' : ''),
+          onClick: () => patchActivity((a) => { a.sittingMin = h * 60; }),
+        }, `~${h}h`)),
+        el('button', { class: 'btn btn--sm btn--ghost', onClick: () => patchActivity((a) => { a.sittingMin += 30; }) }, '+30m')),
+      el('div', { class: 'row' },
+        el('button', { class: 'btn', onClick: () => { logBreak(); toast('Break logged — good.', { type: 'success', duration: 1500 }); } },
+          icon('walk', { size: 16 }), 'I stood up / moved'),
+        bal.camBreaks ? el('span', { class: 'field__hint' }, `includes ${bal.camBreaks} auto-detected by the camera`) : null)
+    );
+
+    mount(host, todayCard, sittingCard, weeklyCard);
 
     // Celebrate the moment a goal crosses the line (not on every re-render).
     if (prevWaterPct != null && prevWaterPct < 100 && waterPct >= 100) celebrate(waterBlock);
@@ -179,7 +240,8 @@ export function init(mountEl) {
   const unsub = store.subscribe(KEY, render);
   const unsub2 = store.subscribe('settings', render);
   const unsub3 = store.subscribe('flareLog', render);
-  return () => { unsub(); unsub2(); unsub3(); };
+  const unsub4 = store.subscribe(ACT_KEY, render);
+  return () => { unsub(); unsub2(); unsub3(); unsub4(); };
 }
 
 export function getSummary() {

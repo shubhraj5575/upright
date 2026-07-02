@@ -8,6 +8,7 @@ import { el, mount, card } from '../core/ui.js';
 import { lineChart } from '../core/charts.js';
 import { summarizeDay } from './cam-session.js';
 import { completedFlares, activeFlare, activeFlareDays } from '../core/flare.js';
+import { regionCounts, topRegions } from '../core/body-regions.js';
 
 function lastKeys(days) {
   const keys = [];
@@ -56,7 +57,47 @@ function painSection() {
   } else {
     mount(body, el('p', { class: 'text-muted' }, 'Not enough pain entries yet to chart a trend.'));
   }
+
+  // Body-map heat summary: where the pain landed, by days affected.
+  const top = topRegions(regionCounts(log, keys), 4);
+  if (top.length) {
+    mount(body, el('p', { style: { marginTop: 'var(--space-3)' } },
+      el('strong', {}, 'Most affected: '),
+      top.map((r) => `${r.label} (${r.count} day${r.count === 1 ? '' : 's'})`).join(', '), '.'));
+  }
   return card('Pain & stiffness (last 4 weeks)', body);
+}
+
+function medsSection() {
+  const log = store.get('medLog') || {};
+  const keys = lastKeys(14);
+  const counts = {};
+  let any = false;
+  for (const k of keys) {
+    for (const e of log[k] || []) {
+      any = true;
+      const label = `${e.name}${e.dose ? ' ' + e.dose : ''}`;
+      counts[label] = (counts[label] || 0) + 1;
+    }
+  }
+  if (!any) return null;
+  const rows = Object.entries(counts).sort((a, b) => b[1] - a[1])
+    .map(([label, n]) => el('li', {}, `${label}: ${n}× in 14 days`));
+  return card('Medications & supplements (last 2 weeks)',
+    el('ul', {}, ...rows),
+    el('p', { class: 'text-faint', style: { fontSize: 'var(--text-xs)', marginTop: 'var(--space-2)' } },
+      'Self-logged frequency only — not a prescription record.'));
+}
+
+function weightSection() {
+  const cfg = ((store.get('settings') || {}).wellbeing) || {};
+  if (!cfg.weightEnabled) return null;
+  const log = store.get('weightLog') || {};
+  const keys = lastKeys(84);
+  const vals = keys.map((k) => (log[k] && typeof log[k].kg === 'number' ? log[k].kg : null)).filter((v) => v != null);
+  if (vals.length < 2) return null;
+  return card('Weight (last 12 weeks)',
+    el('p', {}, `${fmt(vals[0])} kg → ${fmt(vals[vals.length - 1])} kg across ${vals.length} entries.`));
 }
 
 function exerciseSection() {
@@ -201,6 +242,8 @@ export function init(mountEl) {
     exerciseSection(),
     goalsSection(),
     cameraSection(),
+    medsSection(),
+    weightSection(),
     el('p', { class: 'text-faint', style: { fontSize: 'var(--text-xs)', marginTop: 'var(--space-4)' } },
       'Upright is a self-tracking wellness tool, not a medical record or medical advice. '
       + 'Figures are self-reported.')

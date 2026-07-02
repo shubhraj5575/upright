@@ -962,3 +962,61 @@
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
+
+/* --- pain body map ----------------------------------------------------------- */
+.body-map-wrap { display: flex; justify-content: center; }
+.body-map { max-width: 220px; }
+.body-map__outline {
+  fill: var(--color-surface-2);
+  stroke: var(--color-border-strong);
+  stroke-width: 1.5;
+}
+.body-map__spine { stroke: var(--color-border-strong); stroke-dasharray: 3 4; stroke-width: 1.5; }
+.body-map__region {
+  fill: transparent;
+  stroke: var(--color-border-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  cursor: pointer;
+  transition: fill var(--transition-fast);
+}
+.body-map__region:hover { fill: color-mix(in srgb, var(--color-danger) 18%, transparent); }
+.body-map__region:focus-visible {
+  outline: none;
+  stroke: var(--color-focus);
+  stroke-width: 2.5;
+  stroke-dasharray: none;
+}
+.body-map__region--on {
+  fill: color-mix(in srgb, var(--color-danger) 45%, transparent);
+  stroke: var(--color-danger);
+  stroke-dasharray: none;
+}
+
+/* --- breathing overlay ---------------------------------------------------------- */
+.breath { text-align: center; padding: var(--space-3) 0; }
+.breath__circle {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto var(--space-4);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--color-primary-soft), var(--color-primary));
+  transform: scale(0.72);
+  transition: transform 3.8s cubic-bezier(0.4, 0, 0.6, 1);
+}
+.breath__circle--in { transform: scale(1); }
+.breath__circle--still { transition: none; transform: scale(0.86); }
+.breath__phase {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+.breath__count {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  min-height: 44px;
+  font-variant-numeric: tabular-nums;
+}
+.breath__remain { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3); }

@@ -36,9 +36,11 @@
     import flareSuite from './flare.test.js';
     import reviewSuite from './review.test.js';
     import insightsSuite from './insights.test.js';
+    import csvSuite from './csv.test.js';
+    import bodyRegionsSuite from './body-regions.test.js';
 
     const out = document.getElementById('out');
-    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite, scoreSuite, camSessionSuite, ladderSuite, diagSuite, flareSuite, reviewSuite, insightsSuite];
+    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite, scoreSuite, camSessionSuite, ladderSuite, diagSuite, flareSuite, reviewSuite, insightsSuite, csvSuite, bodyRegionsSuite];
     let total = 0, failed = 0;
 
     for (const s of suites) {

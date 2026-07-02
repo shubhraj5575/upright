@@ -32,10 +32,11 @@ export async function requestPermission() {
 /**
  * Fire a reminder. Uses a real notification if granted, otherwise a toast.
  * @param {string} title
- * @param {{ body?:string, type?:string, onClick?:Function, toastDuration?:number }} [opts]
+ * @param {{ body?:string, type?:string, onClick?:Function, actionLabel?:string, toastDuration?:number }} [opts]
+ *   actionLabel labels the toast-fallback button (default 'Open').
  */
 export function fire(title, opts = {}) {
-  const { body = '', type = 'info', onClick, toastDuration = 8000 } = opts;
+  const { body = '', type = 'info', onClick, actionLabel = 'Open', toastDuration = 8000 } = opts;
   if (canNotify()) {
     try {
       const n = new Notification(title, { body, tag: 'upright-reminder', renotify: true });
@@ -47,7 +48,7 @@ export function fire(title, opts = {}) {
       /* fall through to toast */
     }
   }
-  toast(`${title}${body ? ' — ' + body : ''}`, { type, duration: toastDuration, action: onClick ? { label: 'Open', onClick } : undefined });
+  toast(`${title}${body ? ' — ' + body : ''}`, { type, duration: toastDuration, action: onClick ? { label: actionLabel, onClick } : undefined });
   return { via: 'toast' };
 }
 

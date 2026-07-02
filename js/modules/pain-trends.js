@@ -6,6 +6,7 @@ import { todayKey, addDays, parseKey } from '../core/dates.js';
 import { el, mount, clear, card, slider, toast, pageHeader, segmented, emptyState } from '../core/ui.js';
 import { icon } from '../core/icons.js';
 import { lineChart, srTable } from '../core/charts.js';
+import { createBodyMap } from './body-map.js';
 
 const KEY = 'painLog';
 const RANGES = [
@@ -76,6 +77,7 @@ export function init(mountEl) {
     id: 'mood', label: 'Mood (optional)', min: 1, max: 5, value: existing.mood ?? 3,
     format: (v) => ['—', '😞', '😕', '😐', '🙂', '😄'][v] || v,
   });
+  const bodyMap = createBodyMap({ selected: existing.regions || [] });
   const notes = el('textarea', { class: 'textarea', id: 'notes', placeholder: 'Anything notable today? (optional)' });
   notes.value = existing.notes || '';
 
@@ -89,6 +91,7 @@ export function init(mountEl) {
         pain: painS.get(),
         stiffness: stiffS.get(),
         mood: moodS.get(),
+        regions: bodyMap.get(),
         notes: notes.value.trim(),
       },
     }));
@@ -103,6 +106,10 @@ export function init(mountEl) {
     painS.field,
     stiffS.field,
     moodS.field,
+    el('div', { class: 'field' },
+      el('label', {}, 'Where is it? (tap the spots — optional)'),
+      el('div', { class: 'body-map-wrap' }, bodyMap.el),
+      el('span', { class: 'field__hint' }, 'Back view — your left is on the left.')),
     el('div', { class: 'field' }, el('label', { for: 'notes' }, 'Notes'), notes),
     el('div', { class: 'row' }, saveBtn, savedHint)
   );

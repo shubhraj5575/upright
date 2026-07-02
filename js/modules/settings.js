@@ -11,6 +11,7 @@ import { mergeSettings } from '../core/schema.js';
 import { el, mount, card, toast, slider, pageHeader, segmented, setFieldError, openDialog } from '../core/ui.js';
 import { icon } from '../core/icons.js';
 import { RED_FLAG_TITLE, RED_FLAG_BODY } from '../core/flare.js';
+import { CSV_KINDS, logToCsv } from '../core/csv.js';
 import { applyTheme } from '../core/theme.js';
 import { resetReminderClock } from './posture-reminders.js';
 
@@ -177,6 +178,55 @@ function flareCard() {
       el('a', { href: '#/flare' }, 'Open flare mode →')));
 }
 
+function wellbeingCard() {
+  const w = settings().wellbeing || {};
+  const meds = settings().meds || {};
+
+  const weightEnable = el('input', { type: 'checkbox', checked: !!w.weightEnabled,
+    onChange: (e) => { patch((n) => { n.wellbeing.weightEnabled = e.target.checked; });
+      toast(e.target.checked ? 'Weight tracking on — find it in Wellbeing.' : 'Weight tracking off (data kept).', { type: 'info' }); } });
+  const unitSeg = segmented({
+    ariaLabel: 'Weight unit',
+    value: w.weightUnit === 'lb' ? 'lb' : 'kg',
+    options: [{ value: 'kg', label: 'kg' }, { value: 'lb', label: 'lb' }],
+    onChange: (v) => patch((n) => { n.wellbeing.weightUnit = v; }),
+  });
+
+  // Med reminder times: a small editable list.
+  const timesHost = el('div', { class: 'row', style: { flexWrap: 'wrap' } });
+  function renderTimes() {
+    const times = (settings().meds || {}).reminderTimes || [];
+    timesHost.replaceChildren(
+      ...times.map((t) => el('span', { class: 'badge badge--primary' }, t,
+        el('button', { class: 'toast__close', 'aria-label': `Remove ${t} reminder`, style: { fontSize: 'var(--text-sm)' },
+          onClick: () => { patch((n) => { n.meds.reminderTimes = n.meds.reminderTimes.filter((x) => x !== t); }); renderTimes(); } }, '×'))),
+      times.length ? null : el('span', { class: 'field__hint' }, 'No reminder times yet.')
+    );
+  }
+  renderTimes();
+  const timeInput = el('input', { class: 'input', type: 'time', style: { maxWidth: '140px' } });
+  const addTime = el('button', { class: 'btn btn--sm', onClick: () => {
+    const t = timeInput.value;
+    if (!t) return;
+    patch((n) => {
+      if (!n.meds.reminderTimes.includes(t)) n.meds.reminderTimes = [...n.meds.reminderTimes, t].sort();
+    });
+    renderTimes();
+    toast(`Med reminder at ${t} added.`, { type: 'success' });
+  } }, 'Add time');
+
+  return card('Wellbeing',
+    el('label', { class: 'row', style: { gap: 'var(--space-2)' } }, weightEnable, ' Track weight (optional — weekly averages, no goals)'),
+    el('div', { class: 'field', style: { marginTop: 'var(--space-3)' } }, el('label', {}, 'Weight unit'), unitSeg.root),
+    el('hr', { class: 'rule' }),
+    el('div', { class: 'field', style: { marginBottom: 0 } },
+      el('label', {}, 'Medication reminder times'),
+      timesHost,
+      el('div', { class: 'row', style: { marginTop: 'var(--space-3)' } }, timeInput, addTime),
+      el('span', { class: 'field__hint' }, 'Fires while the app is open (a browser limit) — pair with a phone alarm for must-not-miss doses.'))
+  );
+}
+
 function streakCard() {
   const cur = settings().streakGrace ?? 1;
   const opts = [
@@ -240,6 +290,26 @@ function dataCard() {
     else toast(res.error || 'Import failed.', { type: 'error' });
   } }, 'Import');
 
+  // Per-log CSV export — data freedom beyond the JSON backup.
+  const csvSelect = el('select', { class: 'select', style: { maxWidth: '280px' } },
+    ...CSV_KINDS.map((k) => el('option', { value: k.id }, k.label)));
+  const csvBtn = el('button', { class: 'btn', onClick: () => {
+    const kindId = csvSelect.value;
+    try {
+      const text = logToCsv(kindId, store.get(kindId));
+      const blob = new Blob([text], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = el('a', { href: url, download: `upright-${kindId}-${new Date().toISOString().slice(0, 10)}.csv` });
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      toast('CSV downloaded.', { type: 'success' });
+    } catch (_) {
+      toast('Could not build that CSV.', { type: 'error' });
+    }
+  } }, icon('download', { size: 15 }), 'Download CSV');
+
   return card('Your data',
     el('p', { class: 'card__subtitle' }, 'Everything stays on this device. Clearing your browser data wipes it, so keep a recent backup.'),
     el('div', { class: 'field' }, exportBtn, nudge),
@@ -251,7 +321,11 @@ function dataCard() {
         el('label', {}, modeMerge, ' Merge (keep what’s here, add anything missing)'),
         el('label', {}, modeReplace, ' Replace (overwrite everything with the file)')),
       el('span', { class: 'field__hint' }, 'Merge never overwrites a newer local entry with an older backup.')),
-    el('div', { class: 'row' }, importBtn)
+    el('div', { class: 'row' }, importBtn),
+    el('hr', { class: 'rule' }),
+    el('div', { class: 'field', style: { marginBottom: 0 } },
+      el('label', {}, 'Export one log as a spreadsheet (CSV)'),
+      el('div', { class: 'row' }, csvSelect, csvBtn))
   );
 }
 
@@ -320,6 +394,7 @@ export function init(mountEl) {
     { id: 'goals', label: 'Goals', node: goalsCard() },
     { id: 'camera', label: 'Camera', node: cameraCard() },
     { id: 'flare', label: 'Flare', node: flareCard() },
+    { id: 'wellbeing', label: 'Wellbeing', node: wellbeingCard() },
     { id: 'streaks', label: 'Streaks', node: streakCard() },
     { id: 'physio', label: 'Physio', node: physioCard() },
     { id: 'data', label: 'Data', node: dataCard() },
