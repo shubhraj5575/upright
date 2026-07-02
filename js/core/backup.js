@@ -3,7 +3,7 @@
 // and DOM-free so they can be unit-tested; the *ToFile / *FromFile wrappers add
 // the browser download / FileReader plumbing on top.
 
-import { KEYS, KIND, SCHEMA_VERSION, validateDataset, defaultFor } from './schema.js';
+import { KEYS, KIND, SCHEMA_VERSION, validateDataset, defaultFor, mergeSettings } from './schema.js';
 import * as store from './store.js';
 import { daysAgo } from './dates.js';
 
@@ -138,6 +138,9 @@ export function importFromFile(file, mode = MERGE) {
       if (!result.ok) return resolve(result);
       const merged = mergeDatasets(store.all(), result.data, mode);
       store.replaceAll(merged);
+      // A backup from an older app version may carry a partial settings shape;
+      // backfill immediately so nothing downstream sees missing nested objects.
+      store.update('settings', (s) => mergeSettings(s));
       resolve({ ok: true });
     };
     reader.readAsText(file);

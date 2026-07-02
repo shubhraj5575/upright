@@ -18,9 +18,13 @@ const MODEL_URL = 'vendor/movenet/model.json';
 const TF_SRC = 'vendor/tfjs/tf.min.js';
 const POSE_SRC = 'vendor/tfjs/pose-detection.min.js';
 
-const INFER_MS = 160; // ~6 fps — plenty for posture, easy on the CPU/GPU
+const INFER_MIN_MS = 160; // ~6 fps ceiling — plenty for posture
+const INFER_MAX_MS = 1000;
+const CPU_MIN_MS = 500; // cpu backend is slow; don't saturate the main thread
+const NO_POSE_MS = 1000; // back off when nobody is in frame
 const POOR_HOLD_MS = 4000; // only alert after a slump persists this long
 const LOST_MS = 2500; // "can't see you" after this long with no pose
+const VIDEO_START_TIMEOUT_MS = 8000;
 
 let libsPromise = null;
 function loadScript(src) {
@@ -43,25 +47,107 @@ async function loadLibs() {
   await libsPromise;
 }
 
-function isProbablyMobile() {
-  return matchMedia('(max-width: 640px)').matches || matchMedia('(pointer: coarse)').matches;
+/**
+ * Pure device assessment. A handheld is only *likely* when the UA says
+ * phone/tablet AND there's a real multi-touch screen. Window width alone must
+ * NEVER factor in: a narrow desktop window is not a phone, and a coarse
+ * pointer can be a desktop touchscreen. The result is advisory — it renders a
+ * dismissible hint, never a hard block.
+ */
+export function assessDevice({ ua = '', maxTouchPoints = 0 } = {}) {
+  const uaPhoneOrTablet = /android|iphone|ipad|ipod|windows phone|mobile|tablet/i.test(ua);
+  return { likelyHandheld: uaPhoneOrTablet && maxTouchPoints > 1 };
 }
 
 function cameraSettings() {
   return (store.get('settings') || {}).postureCamera || {};
 }
 
+function withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(label || 'Timed out')), ms);
+    promise.then(
+      (v) => { clearTimeout(t); resolve(v); },
+      (e) => { clearTimeout(t); reject(e); }
+    );
+  });
+}
+
+/** Resolves when the video element has real frames to analyse. */
+function videoReady(video) {
+  if (video.readyState >= 2) return Promise.resolve();
+  return new Promise((resolve) => {
+    video.addEventListener('loadeddata', resolve, { once: true });
+  });
+}
+
+// --- detector cache --------------------------------------------------------
+// Created once per page load and deliberately NOT disposed on teardown: cold
+// start (libs + model + first inference) can take many seconds, and navigating
+// back to this view should not pay that again. Camera tracks, by contrast, are
+// ALWAYS stopped on teardown (privacy light off).
+let detectorState = null; // { detector, backend, warmed } once resolved
+let detectorPromise = null;
+
+async function getDetector(onStage) {
+  if (detectorState) return detectorState;
+  if (!detectorPromise) {
+    detectorPromise = (async () => {
+      onStage('libs');
+      await loadLibs();
+      const tf = window.tf;
+
+      // webgl → cpu fallback. setBackend resolves false (or throws) when a
+      // backend can't initialise, e.g. no GPU/WebGL in this browser.
+      let backend = 'webgl';
+      try {
+        const ok = await tf.setBackend('webgl');
+        if (!ok) throw new Error('webgl backend rejected');
+        await tf.ready();
+      } catch (_) {
+        backend = 'cpu';
+        await tf.setBackend('cpu');
+        await tf.ready();
+      }
+
+      onStage('model');
+      const detector = await window.poseDetection.createDetector(
+        window.poseDetection.SupportedModels.MoveNet,
+        { modelType: window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING, modelUrl: MODEL_URL }
+      );
+
+      // Warm-up: the FIRST inference compiles shaders / allocates buffers and
+      // can take several seconds. Run it once on a blank offscreen canvas so
+      // the live loop starts fast and never stacks calls behind a slow first
+      // tick.
+      onStage('warmup');
+      const canvas = document.createElement('canvas');
+      canvas.width = 320; canvas.height = 240;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#808080';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      try {
+        await detector.estimatePoses(canvas, { maxPoses: 1, flipHorizontal: false });
+      } catch (_) { /* warm-up best effort */ }
+
+      detectorState = { detector, backend, warmed: true };
+      return detectorState;
+    })().catch((e) => { detectorPromise = null; throw e; });
+  }
+  return detectorPromise;
+}
+
 /**
  * Mount the camera section into hostEl. Returns a teardown that fully stops the
- * camera, the loop, and releases the detector. (Named mountCamera to avoid
- * clashing with ui.mount imported above.)
+ * camera and the loop. (Named mountCamera to avoid clashing with ui.mount.)
  */
 export function mountCamera(hostEl) {
   let stream = null;
-  let detector = null;
   let video = null;
   let loopTimer = null;
   let disposed = false;
+  let inFlight = false;
+  let inferEma = 0; // exponential moving average of inference duration (ms)
   let lastSeen = 0;
   let poorSince = 0;
   let alerted = false;
@@ -70,6 +156,7 @@ export function mountCamera(hostEl) {
   const statusDot = el('span', { class: 'cam-dot' });
   const statusText = el('span', { class: 'cam-status__text' }, 'Idle');
   const detail = el('p', { class: 'field__hint' }, '');
+  const backendNote = el('div', {});
   const videoWrap = el('div', { class: 'cam-video', style: { display: 'none' } });
   const controls = el('div', { class: 'row', style: { marginTop: 'var(--space-3)' } });
 
@@ -81,7 +168,7 @@ export function mountCamera(hostEl) {
 
   function stopCamera() {
     monitoring = false;
-    if (loopTimer) { clearInterval(loopTimer); loopTimer = null; }
+    if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
     if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
     if (video) { video.pause?.(); video.srcObject = null; }
     videoWrap.style.display = 'none';
@@ -100,6 +187,8 @@ export function mountCamera(hostEl) {
         setStatus('off', 'Permission denied', 'Allow camera access in your browser to use posture monitoring. Frames stay on your device.');
       } else if (err && err.name === 'NotFoundError') {
         setStatus('off', 'No camera found', 'Connect a webcam and try again.');
+      } else if (err && (err.name === 'NotReadableError' || err.name === 'AbortError')) {
+        setStatus('off', 'Camera is busy', 'Another app may be using the camera. Close it (video calls, camera apps) and press Start to retry.');
       } else {
         setStatus('off', 'Camera unavailable', String(err && err.message || err));
       }
@@ -108,35 +197,83 @@ export function mountCamera(hostEl) {
     video = el('video', { autoplay: '', playsinline: '', muted: '' });
     video.srcObject = stream;
     clear(videoWrap); mount(videoWrap, video, el('div', { class: 'cam-badge' }, '🔴 on-device only'));
-    await video.play().catch(() => {});
+    try {
+      // Surface failures instead of swallowing them — a silent black video is
+      // the worst outcome. 8s covers slow cameras; beyond that, tell the user.
+      await withTimeout(
+        Promise.resolve(video.play()).then(() => videoReady(video)),
+        VIDEO_START_TIMEOUT_MS,
+        'Video did not start'
+      );
+    } catch (err) {
+      stopCamera();
+      setStatus('off', 'Video didn’t start', 'The camera opened but no picture arrived. Another app may be using it — close other video apps and press Start to retry.');
+      return false;
+    }
     return true;
   }
 
   async function ensureDetector() {
-    if (detector) return true;
-    setStatus('load', 'Loading posture model…', 'First time only — about 5 MB, loaded from this device.');
     try {
-      await loadLibs();
-      await window.tf.setBackend('webgl');
-      await window.tf.ready();
-      detector = await window.poseDetection.createDetector(
-        window.poseDetection.SupportedModels.MoveNet,
-        { modelType: window.poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING, modelUrl: MODEL_URL }
-      );
-      return true;
+      const state = await getDetector((stage) => {
+        if (disposed) return;
+        if (stage === 'libs') setStatus('load', 'Loading analysis libraries…', 'First time only — about 3 MB, loaded from this device.');
+        else if (stage === 'model') setStatus('load', 'Loading posture model…', 'First time only — about 5 MB, loaded from this device.');
+        else if (stage === 'warmup') setStatus('load', 'Warming up…', 'Preparing the model. The first run can take a few seconds.');
+      });
+      clear(backendNote);
+      if (state.backend === 'cpu') {
+        mount(backendNote, el('div', { class: 'callout', style: { marginTop: 'var(--space-3)' } },
+          el('p', {}, 'No GPU acceleration available in this browser, so posture checks run about once per second. Monitoring still works.')));
+      }
+      return state;
     } catch (err) {
       setStatus('off', 'Couldn’t load the model', 'The on-device posture model failed to load. ' + (err && err.message || ''));
-      return false;
+      return null;
     }
   }
 
+  // --- inference loop -------------------------------------------------------
+  // Self-scheduling, never re-entrant: the next tick is queued only after the
+  // current one finishes, with a cadence that adapts to how slow inference
+  // actually is on this machine (EMA × 1.5). A fixed setInterval here once
+  // stacked ~98 calls behind a 15s cold-start inference.
+  function nextDelay(sawPose) {
+    const backend = detectorState && detectorState.backend;
+    let d = inferEma ? inferEma * 1.5 : INFER_MIN_MS;
+    d = Math.max(INFER_MIN_MS, Math.min(INFER_MAX_MS, d));
+    if (backend === 'cpu') d = Math.max(d, CPU_MIN_MS);
+    if (!sawPose) d = Math.max(d, NO_POSE_MS);
+    return d;
+  }
+
+  function scheduleTick(ms) {
+    if (disposed || !monitoring) return;
+    loopTimer = setTimeout(runTick, ms);
+  }
+
+  async function runTick() {
+    if (disposed || !monitoring || inFlight) return;
+    inFlight = true;
+    const t0 = performance.now();
+    let sawPose = false;
+    try {
+      sawPose = await tick();
+    } catch (_) { /* skip frame */ }
+    inFlight = false;
+    const dt = performance.now() - t0;
+    inferEma = inferEma ? inferEma * 0.7 + dt * 0.3 : dt;
+    scheduleTick(nextDelay(sawPose));
+  }
+
+  /** One analysis pass. Returns true when a usable pose was seen. */
   async function tick() {
-    if (disposed || !detector || !video || video.readyState < 2) return;
+    if (disposed || !detectorState || !video || video.readyState < 2) return false;
     let poses;
     try {
-      poses = await detector.estimatePoses(video, { maxPoses: 1, flipHorizontal: false });
+      poses = await detectorState.detector.estimatePoses(video, { maxPoses: 1, flipHorizontal: false });
     } catch (_) {
-      return;
+      return false;
     }
     const now = Date.now();
     const kp = poses && poses[0] && poses[0].keypoints;
@@ -144,7 +281,7 @@ export function mountCamera(hostEl) {
 
     if (!metrics) {
       if (now - lastSeen > LOST_MS) setStatus('warn', 'Can’t see you', 'Make sure your head and shoulders are in frame and well lit.');
-      return;
+      return false;
     }
     lastSeen = now;
 
@@ -154,7 +291,7 @@ export function mountCamera(hostEl) {
 
     if (verdict.state === 'uncalibrated') {
       setStatus('warn', 'Not calibrated', 'Sit tall and press “Calibrate” so Upright learns your good posture.');
-      return;
+      return true;
     }
     if (verdict.state === 'good') {
       poorSince = 0; alerted = false;
@@ -169,29 +306,31 @@ export function mountCamera(hostEl) {
         notify.fire('🪑 Posture check', { body: label + ' for a while — sit tall and reset.', type: 'warn' });
       }
     }
+    return true;
   }
 
   async function beginMonitoring() {
     if (monitoring) return;
     const okCam = await startCamera();
-    if (!okCam) return;
-    const okModel = await ensureDetector();
-    if (!okModel) { stopCamera(); return; }
+    if (okCam === false) { renderControls(); return; }
+    const state = await ensureDetector();
+    if (!state) { stopCamera(); renderControls(); return; }
+    if (disposed) { stopCamera(); return; }
     videoWrap.style.display = '';
     monitoring = true;
     lastSeen = Date.now();
     setStatus('good', cameraSettings().baseline ? 'Monitoring…' : 'Calibrate to begin', '');
-    loopTimer = setInterval(tick, INFER_MS);
+    scheduleTick(INFER_MIN_MS);
     renderControls();
   }
 
   async function calibrate() {
-    if (!monitoring || !detector || !video) { toast('Start the camera first.', { type: 'warn' }); return; }
+    if (!monitoring || !detectorState || !video) { toast('Start the camera first.', { type: 'warn' }); return; }
     setStatus('load', 'Calibrating… sit tall', 'Hold a good posture for a moment.');
     const samples = [];
     for (let i = 0; i < 12; i++) {
       try {
-        const poses = await detector.estimatePoses(video, { maxPoses: 1, flipHorizontal: false });
+        const poses = await detectorState.detector.estimatePoses(video, { maxPoses: 1, flipHorizontal: false });
         const m = poses && poses[0] && computeMetrics(poses[0].keypoints);
         if (m) samples.push(m);
       } catch (_) { /* skip frame */ }
@@ -220,13 +359,13 @@ export function mountCamera(hostEl) {
   // --- initial render -------------------------------------------------------
   function renderShell() {
     clear(hostEl);
-    const enabled = !!cameraSettings().enabled;
+    const cam = cameraSettings();
     const card = el('section', { class: 'card' },
       el('h2', { class: 'card__title' }, 'Camera posture AI'),
       el('p', { class: 'card__subtitle' }, 'On-device webcam monitoring. Frames never leave your device and are never stored.')
     );
 
-    if (!enabled) {
+    if (!cam.enabled) {
       mount(card, el('div', { class: 'callout' },
         el('p', {}, 'Camera monitoring is off. '),
         el('a', { class: 'btn btn--sm', href: '#/settings', style: { marginTop: 'var(--space-2)' } }, 'Enable in Settings →')));
@@ -234,17 +373,26 @@ export function mountCamera(hostEl) {
       return;
     }
 
-    if (isProbablyMobile()) {
+    // Handheld advisory — never a block. Dismissing persists so it doesn't nag.
+    const device = assessDevice({ ua: navigator.userAgent, maxTouchPoints: navigator.maxTouchPoints || 0 });
+    if (device.likelyHandheld && !cam.dismissedMobileAdvice) {
       mount(card, el('div', { class: 'callout callout--warn' },
-        el('p', {}, 'Camera posture AI is designed for a desktop/laptop webcam while you sit at a desk. '
-          + 'On a phone it’s impractical, so it’s hidden here. Use the quick check-ins above instead.')));
+        el('p', {}, 'This looks like a phone or tablet. Camera monitoring works best with a webcam at a desk — '
+          + 'if you want to use it here, prop the device up at about chest height, facing you.'),
+        el('div', { class: 'row', style: { marginTop: 'var(--space-3)' } },
+          el('button', {
+            class: 'btn btn--sm',
+            onClick: () => {
+              store.update('settings', (s) => ({ ...s, postureCamera: { ...(s.postureCamera || {}), dismissedMobileAdvice: true } }));
+            },
+          }, 'Use camera anyway'))));
       mount(hostEl, card);
       return;
     }
 
     const statusRow = el('div', { class: 'cam-status' }, statusDot, statusText);
-    mount(card, statusRow, detail, videoWrap, controls);
-    setStatus('off', 'Idle', cameraSettings().baseline ? 'Press start to monitor your posture.' : 'Press start, then calibrate your “sit tall” posture.');
+    mount(card, statusRow, detail, backendNote, videoWrap, controls);
+    setStatus('off', 'Idle', cam.baseline ? 'Press start to monitor your posture.' : 'Press start, then calibrate your “sit tall” posture.');
     renderControls();
     mount(hostEl, card);
   }
@@ -255,8 +403,8 @@ export function mountCamera(hostEl) {
   return () => {
     disposed = true;
     stopCamera();
-    if (detector && detector.dispose) { try { detector.dispose(); } catch (_) {} }
-    detector = null;
+    // The detector is intentionally kept (module-level cache) so returning to
+    // this view skips the multi-second cold start. Tracks are always stopped.
     unsub();
   };
 }

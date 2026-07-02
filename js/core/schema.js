@@ -15,6 +15,7 @@ export const KEYS = [
   'exerciseLog',
   'mealPlan',
   'mealLog',
+  'ergoChecklist',
 ];
 
 /**
@@ -34,6 +35,7 @@ export const KIND = {
   exerciseLog: 'map',
   mealPlan: 'object',
   mealLog: 'map',
+  ergoChecklist: 'object',
 };
 
 /** Default settings — referenced by modules so config has stable shape. */
@@ -81,6 +83,7 @@ export function defaults(createdAt = null) {
     exerciseLog: {}, // dayKey -> [exerciseId, ...]
     mealPlan: {}, // weekly grid — seeded from /data in Phase 3
     mealLog: {}, // dayKey -> [{ name, tags:[], t: ISO }]
+    ergoChecklist: {}, // habitId -> true (today's ticked ergonomic habits)
   };
 }
 

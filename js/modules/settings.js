@@ -7,6 +7,7 @@
 import * as store from '../core/store.js';
 import * as backup from '../core/backup.js';
 import * as notify from '../core/notify.js';
+import { mergeSettings } from '../core/schema.js';
 import { el, mount, card, toast, slider } from '../core/ui.js';
 import { applyTheme } from '../core/theme.js';
 import { resetReminderClock } from './posture-reminders.js';
@@ -16,7 +17,9 @@ function settings() {
 }
 function patch(mutator) {
   store.update('settings', (s) => {
-    const next = JSON.parse(JSON.stringify(s || {}));
+    // Backfill first: a partial settings object (e.g. freshly imported from an
+    // old backup) must never leave a mutator touching a missing nested object.
+    const next = mergeSettings(JSON.parse(JSON.stringify(s || {})));
     mutator(next);
     return next;
   });
