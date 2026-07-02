@@ -3,7 +3,7 @@
 // edits persist. Module contract: exports init(mountEl) and getSummary().
 
 import * as store from '../core/store.js';
-import { el, mount, clear, card, toast } from '../core/ui.js';
+import { el, mount, clear, card, toast, pageHeader, skeletonGrid, confirmDialog } from '../core/ui.js';
 
 const KEY = 'mealPlan';
 const STARTER_URL = 'data/meal-plan-starter.json';
@@ -40,10 +40,10 @@ export function init(mountEl) {
 
   const host = el('div', { class: 'stack' });
   mount(mountEl,
-    el('div', { class: 'view-header' },
-      el('h1', {}, 'Meal plan'),
-      el('p', {}, 'A customizable, anti-inflammatory week built around recovery foods — oily fish, leafy greens, berries and whole grains. Tweak any meal to suit you.')
-    ),
+    pageHeader({
+      title: 'Meal plan',
+      sub: 'A customizable, anti-inflammatory week built around recovery foods — oily fish, leafy greens, berries and whole grains. Tweak any meal to suit you.',
+    }),
     host
   );
 
@@ -138,30 +138,31 @@ export function init(mountEl) {
   // --- one day card -------------------------------------------------------
   function dayCard(p, dayIndex) {
     const day = p.days[dayIndex];
-    return card(day.day,
+    const weekdayToday = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    const isToday = String(day.day).toLowerCase().startsWith(weekdayToday.toLowerCase().slice(0, 3));
+    const c = card(null,
+      el('div', { class: 'row row--between', style: { marginBottom: 'var(--space-3)' } },
+        el('h2', { class: 'card__title', style: { marginBottom: 0 } }, day.day),
+        isToday ? el('span', { class: 'badge badge--primary' }, 'Today') : null),
       el('div', { class: 'stack', style: { gap: 'var(--space-3)' } },
         ...SLOTS.map((slot) => mealSlot(p, dayIndex, slot))
       )
     );
+    if (isToday) c.style.borderColor = 'var(--color-primary-border)';
+    return c;
   }
 
-  // --- reset (guarded inline confirm) -------------------------------------
+  // --- reset (confirm dialog) -----------------------------------------------
   function resetRow() {
-    const wrap = el('div', { class: 'row', style: { justifyContent: 'flex-end' } });
-    function ask() {
-      clear(wrap);
-      mount(wrap,
-        el('span', { class: 'text-muted', style: { fontSize: 'var(--text-sm)' } }, 'Replace your plan with the starter week?'),
-        el('button', { class: 'btn btn--danger btn--sm', onClick: () => { seed(true); } }, 'Reset'),
-        el('button', { class: 'btn btn--ghost btn--sm', onClick: idle }, 'Cancel')
-      );
-    }
-    function idle() {
-      clear(wrap);
-      mount(wrap, el('button', { class: 'btn btn--ghost btn--sm', onClick: ask }, 'Reset to starter plan'));
-    }
-    idle();
-    return wrap;
+    return el('div', { class: 'row', style: { justifyContent: 'flex-end' } },
+      el('button', { class: 'btn btn--ghost btn--sm', onClick: async () => {
+        const yes = await confirmDialog({
+          title: 'Reset to the starter plan?',
+          body: 'This replaces your whole week — including any meals you customised — with the starter plan.',
+          confirmLabel: 'Reset plan', danger: true,
+        });
+        if (yes) seed(true);
+      } }, 'Reset to starter plan'));
   }
 
   // --- render -------------------------------------------------------------
@@ -170,7 +171,7 @@ export function init(mountEl) {
     const p = plan();
     clear(host);
     if (!hasDays(p)) {
-      mount(host, el('p', { class: 'text-muted' }, 'Loading your meal plan…'));
+      mount(host, skeletonGrid(4));
       return;
     }
     const grid = el('div', {

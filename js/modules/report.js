@@ -154,9 +154,9 @@ function cameraSection() {
 }
 
 function stat(label, value) {
-  return el('div', {},
-    el('div', { style: { fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-bold)' } }, value),
-    el('div', { class: 'text-muted', style: { fontSize: 'var(--text-sm)' } }, label));
+  return el('div', { class: 'stat' },
+    el('div', { class: 'stat__value' }, value),
+    el('div', { class: 'stat__label' }, label));
 }
 
 export function init(mountEl) {
@@ -164,9 +164,14 @@ export function init(mountEl) {
   const today = parseKey(todayKey()).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   mount(mountEl,
+    // Screen header (hidden in print) + a compact print-only letterhead.
     el('div', { class: 'view-header' },
-      el('h1', {}, 'Physio visit report'),
-      el('p', {}, `Prepared ${today} from your Upright logs.`)),
+      el('div', { class: 'view-header__text' },
+        el('h1', {}, 'Physio visit report'),
+        el('p', {}, `Prepared ${today} from your Upright logs.`))),
+    el('div', { class: 'print-header' },
+      el('strong', {}, 'Upright — physio visit report'),
+      el('span', {}, `Prepared ${today} · self-reported data`)),
     el('div', { class: 'row no-print', style: { marginBottom: 'var(--space-4)' } },
       el('button', { class: 'btn btn--primary', onClick: () => window.print() }, '🖨 Print / Save as PDF'),
       el('span', { class: 'text-faint', style: { fontSize: 'var(--text-sm)' } }, 'Tip: choose “Save as PDF” in the print dialog.')),

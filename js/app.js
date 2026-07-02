@@ -17,6 +17,7 @@ import * as exercises from './modules/exercises.js';
 import * as mealPlan from './modules/meal-plan.js';
 import * as mealLog from './modules/meal-log.js';
 import * as report from './modules/report.js';
+import * as onboarding from './modules/onboarding.js';
 
 function boot() {
   const seeded = store.ensureSeeded();
@@ -37,7 +38,7 @@ function boot() {
   router.register('posture', posture.init, 'Posture');
   router.register('exercises', exercises.init, 'Rehab exercises');
   router.register('meal-plan', mealPlan.init, 'Meal plan');
-  router.register('meals', mealLog.init, 'Meal log');
+  router.register('meals', mealLog.init, 'Food');
   router.register('ergo', ergo.init, 'Ergonomics & sleep');
   router.register('report', report.init, 'Physio report');
   router.register('settings', settings.init, 'Settings');
@@ -56,6 +57,9 @@ function boot() {
 
   // Global reminder loop (independent of the active view).
   posture.startReminders();
+
+  // First-run onboarding (no-op for existing users).
+  onboarding.maybeOnboard();
 
   // PWA: register the service worker for installability + offline.
   if ('serviceWorker' in navigator) {

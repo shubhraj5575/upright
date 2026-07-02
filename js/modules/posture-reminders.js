@@ -5,7 +5,8 @@
 
 import * as store from '../core/store.js';
 import { todayKey } from '../core/dates.js';
-import { el, mount, clear, card, toast } from '../core/ui.js';
+import { el, mount, clear, card, toast, pageHeader, emptyState } from '../core/ui.js';
+import { icon, postureIcon } from '../core/icons.js';
 import * as notify from '../core/notify.js';
 import * as postureCamera from './posture-camera.js';
 
@@ -121,7 +122,7 @@ export function init(mountEl) {
         class: 'btn posture-btn', 'aria-label': `Log posture: ${RATINGS[r].label}`,
         onClick: () => { logPosture(r); toast(`Logged: ${RATINGS[r].label}.`, { type: 'success', duration: 2000 }); },
       },
-        el('span', { class: 'posture-btn__emoji', 'aria-hidden': 'true' }, RATINGS[r].emoji),
+        el('span', { class: 'posture-btn__emoji', 'aria-hidden': 'true' }, postureIcon(r, { size: 34 })),
         el('span', { class: 'posture-btn__label' }, RATINGS[r].label))
     )
   );
@@ -137,11 +138,11 @@ export function init(mountEl) {
     clear(listHost);
     const entries = todayEntries();
     if (!entries.length) {
-      mount(listHost, el('div', { class: 'empty' },
-        el('div', { class: 'empty__icon', 'aria-hidden': 'true' }, '🪑'),
-        el('div', { class: 'empty__title' }, 'No check-ins yet today'),
-        el('p', {}, 'Your posture ratings will appear here.')
-      ));
+      mount(listHost, emptyState({
+        icon: 'posture-4',
+        title: 'No check-ins yet today',
+        body: 'Your posture ratings will appear here.',
+      }));
       return;
     }
     const avg = (entries.reduce((a, e) => a + e.rating, 0) / entries.length).toFixed(1);
@@ -153,7 +154,7 @@ export function init(mountEl) {
       el('ul', { class: 'posture-list' },
         ...entries.slice().reverse().map((e) =>
           el('li', { class: 'posture-list__item' },
-            el('span', { 'aria-hidden': 'true' }, RATINGS[e.rating] ? RATINGS[e.rating].emoji : '•'),
+            el('span', { 'aria-hidden': 'true', style: { color: 'var(--color-text-muted)', display: 'inline-flex' } }, postureIcon(e.rating, { size: 22 })),
             el('span', {}, RATINGS[e.rating] ? RATINGS[e.rating].label : `Rating ${e.rating}`),
             el('span', { class: 'text-faint', style: { marginLeft: 'auto' } }, timeLabel(e.t))
           )
@@ -163,20 +164,18 @@ export function init(mountEl) {
   }
 
   const r = (store.get('settings') || {}).reminders || {};
-  const reminderInfo = el('div', { class: 'callout', style: { marginBottom: 'var(--space-4)' } },
-    r.enabled
-      ? el('span', {}, `🔔 Reminders on — posture every ${r.postureIntervalMin} min, movement every ${r.movementIntervalMin} min, ${r.activeHours.start}–${r.activeHours.end}. `)
-      : el('span', {}, '🔕 Movement-break reminders are off. '),
-    el('a', { href: '#/settings' }, r.enabled ? 'Adjust in Settings →' : 'Turn on in Settings →')
-  );
+  const reminderPill = el('a', { class: 'badge' + (r.enabled ? ' badge--primary' : ''), href: '#/settings', style: { textDecoration: 'none' } },
+    icon(r.enabled ? 'bell' : 'bell-off', { size: 14 }),
+    r.enabled ? ` Reminders every ${r.postureIntervalMin}/${r.movementIntervalMin} min` : ' Reminders off');
 
   const cameraHost = el('div', { style: { marginTop: 'var(--space-4)' } });
 
   mount(mountEl,
-    el('div', { class: 'view-header' },
-      el('h1', {}, 'Posture'),
-      el('p', {}, 'Quick self-check-ins, timed movement-break reminders, and (below) optional camera posture AI.')),
-    reminderInfo,
+    pageHeader({
+      title: 'Posture',
+      sub: 'Quick self-check-ins, movement-break reminders, and optional camera monitoring.',
+      actions: [reminderPill],
+    }),
     logCard,
     todayCard,
     cameraHost

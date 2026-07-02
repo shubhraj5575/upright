@@ -4,7 +4,7 @@
 // and getSummary().
 
 import * as store from '../core/store.js';
-import { el, mount, clear, card } from '../core/ui.js';
+import { el, mount, clear, card, pageHeader, skeleton } from '../core/ui.js';
 
 const KEY = 'ergoChecklist';
 const CONTENT_URL = 'data/ergo-sleep-content.json';
@@ -54,16 +54,15 @@ export function init(mountEl) {
   let unsub = null;
 
   const host = el('div', { class: 'stack' });
-  const loading = el('p', { class: 'text-muted' }, 'Loading guidance…');
 
   mount(mountEl,
-    el('div', { class: 'view-header' },
-      el('h1', {}, 'Ergonomics & sleep'),
-      el('p', {}, 'Simple, practical ways to protect your lower back through the day and night.')
-    ),
+    pageHeader({
+      title: 'Ergonomics & sleep',
+      sub: 'Simple, practical ways to protect your lower back through the day and night.',
+    }),
     host
   );
-  mount(host, loading);
+  mount(host, skeleton({ lines: 6 }));
 
   fetch(CONTENT_URL)
     .then((r) => {
@@ -78,12 +77,14 @@ export function init(mountEl) {
       // --- checklist card: re-render its inner body on every change so toggles
       // don't rebuild the SVG sections above it. ---------------------------
       const progress = el('span', { class: 'badge badge--primary' });
+      const progressBar = el('div', { class: 'progress', 'aria-hidden': 'true' }, el('div', { class: 'progress__fill' }));
       const listBody = el('div', { class: 'stack' });
 
       function renderChecklist() {
         const total = checklist.length;
         const checked = countChecked();
         progress.textContent = `${checked} / ${total} done`;
+        progressBar.firstChild.style.width = total ? `${(checked / total) * 100}%` : '0%';
 
         clear(listBody);
         mount(listBody, ...checklist.map((item) => {
@@ -103,10 +104,11 @@ export function init(mountEl) {
       }
 
       const checklistCard = card('Daily checklist',
-        el('div', { class: 'row row--between', style: { marginBottom: 'var(--space-3)' } },
+        el('div', { class: 'row row--between', style: { marginBottom: 'var(--space-2)' } },
           el('span', { class: 'card__subtitle', style: { margin: 0 } }, 'Tick off the habits you managed today.'),
           progress
         ),
+        progressBar,
         listBody
       );
 

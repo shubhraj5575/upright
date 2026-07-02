@@ -3,7 +3,8 @@
 
 import * as store from '../core/store.js';
 import { todayKey, addDays, parseKey, computeStreak } from '../core/dates.js';
-import { el, mount, clear, card, toast } from '../core/ui.js';
+import { el, mount, clear, card, toast, pageHeader, celebrate, setFieldError } from '../core/ui.js';
+import { icon } from '../core/icons.js';
 import { progressRing, barChart } from '../core/charts.js';
 
 const KEY = 'goalsLog';
@@ -73,8 +74,10 @@ function lastWeek(field) {
 
 export function init(mountEl) {
   const host = el('div', { class: 'stack' });
+  let prevWaterPct = null;
+  let prevStepPct = null;
   mount(mountEl,
-    el('div', { class: 'view-header' }, el('h1', {}, 'Walk & water'), el('p', {}, 'Small daily goals that support recovery — gentle movement and staying hydrated.')),
+    pageHeader({ title: 'Walk & water', sub: 'Small daily goals that support recovery — gentle movement and staying hydrated.' }),
     host
   );
 
@@ -93,43 +96,50 @@ export function init(mountEl) {
       progressRing({
         value: t.waterMl, max: cfg.waterMl, color: 'var(--color-water)',
         center: `${(t.waterMl / 1000).toFixed(t.waterMl % 1000 ? 1 : 0)}L`,
-        sub: `of ${(cfg.waterMl / 1000).toFixed(1)}L`, label: 'Water',
+        sub: `of ${(cfg.waterMl / 1000).toFixed(1)}L`, label: 'Water', animate: true,
       }),
-      el('div', { class: 'ring-block__label' }, '💧 Water'),
+      el('div', { class: 'ring-block__label' }, icon('droplet', { size: 16 }), ' Water'),
       el('div', { class: 'ring-block__actions' },
         el('button', { class: 'btn btn--sm', onClick: () => addWater(cfg.waterStepMl) }, `+${cfg.waterStepMl} ml`),
         el('button', { class: 'btn btn--sm', onClick: () => addWater(500) }, '+500 ml'),
-        el('button', { class: 'btn btn--sm btn--ghost', onClick: () => addWater(-cfg.waterStepMl) }, '−')
+        el('button', { class: 'btn btn--sm btn--ghost', 'aria-label': `Remove ${cfg.waterStepMl} ml`, onClick: () => addWater(-cfg.waterStepMl) }, '−')
       )
     );
 
-    const stepInput = el('input', { class: 'input', type: 'number', min: '0', step: '100', placeholder: 'e.g. 1500', style: { maxWidth: '120px' } });
+    const stepInput = el('input', { class: 'input', type: 'number', min: '0', step: '100', placeholder: 'e.g. 1500', style: { maxWidth: '120px' }, 'aria-label': 'Steps to add' });
+    const stepField = el('div', { class: 'field', style: { marginBottom: 0 } }, stepInput);
     const stepBlock = el('div', { class: 'ring-block' },
       progressRing({
         value: t.steps, max: cfg.steps, color: 'var(--color-primary)',
-        center: t.steps.toLocaleString(), sub: `of ${cfg.steps.toLocaleString()}`, label: 'Steps',
+        center: t.steps.toLocaleString(), sub: `of ${cfg.steps.toLocaleString()}`, label: 'Steps', animate: true,
       }),
-      el('div', { class: 'ring-block__label' }, '🚶 Steps'),
+      el('div', { class: 'ring-block__label' }, icon('walk', { size: 16 }), ' Steps'),
       el('div', { class: 'ring-block__actions' },
         el('button', { class: 'btn btn--sm', onClick: () => addSteps(1000) }, '+1,000'),
-        stepInput,
+        stepField,
         el('button', { class: 'btn btn--sm btn--primary', onClick: () => {
           const v = Number(stepInput.value);
-          if (v > 0) { addSteps(v); stepInput.value = ''; }
+          if (!stepInput.value.trim() || Number.isNaN(v) || v <= 0 || v > 100000) {
+            setFieldError(stepField, 'Enter a step count between 1 and 100,000.');
+            return;
+          }
+          setFieldError(stepField, null);
+          addSteps(Math.round(v));
+          stepInput.value = '';
         } }, 'Add')
       )
     );
 
     const streakRow = el('div', { class: 'row', style: { justifyContent: 'center', marginTop: 'var(--space-4)' } },
-      el('span', { class: 'badge badge--accent' }, `💧 ${waterStreak}-day water streak`),
-      el('span', { class: 'badge badge--primary' }, `🚶 ${stepStreak}-day step streak`)
+      el('span', { class: 'badge badge--accent' }, icon('droplet', { size: 13 }), ` ${waterStreak}-day water streak`),
+      el('span', { class: 'badge badge--primary' }, icon('walk', { size: 13 }), ` ${stepStreak}-day step streak`)
     );
 
     const todayCard = card('Today',
       el('div', { class: 'ring-group' }, waterBlock, stepBlock),
       streakRow,
       (waterPct >= 100 || stepPct >= 100)
-        ? el('p', { class: 'text-muted', style: { textAlign: 'center', marginTop: 'var(--space-3)' } }, '🎉 Goal reached — nicely done.')
+        ? el('p', { class: 'text-muted', style: { textAlign: 'center', marginTop: 'var(--space-3)' } }, 'Goal reached — nicely done.')
         : null
     );
 
@@ -138,16 +148,22 @@ export function init(mountEl) {
     const steps = lastWeek('steps');
     const weeklyCard = card('This week',
       el('div', { class: 'field' },
-        el('label', {}, '💧 Water (ml)'),
-        barChart({ values: water.values, labels: water.labels, goal: cfg.waterMl, color: 'var(--color-water)', height: 140, ariaLabel: 'Water over the last 7 days' })
+        el('label', {}, 'Water (ml)'),
+        barChart({ values: water.values, labels: water.labels, goal: cfg.waterMl, color: 'var(--color-water)', height: 140, ariaLabel: 'Water over the last 7 days', interactive: true, tipFormat: (v) => `${v} ml` })
       ),
       el('div', { class: 'field', style: { marginBottom: 0 } },
-        el('label', {}, '🚶 Steps'),
-        barChart({ values: steps.values, labels: steps.labels, goal: cfg.steps, color: 'var(--color-primary)', height: 140, ariaLabel: 'Steps over the last 7 days' })
+        el('label', {}, 'Steps'),
+        barChart({ values: steps.values, labels: steps.labels, goal: cfg.steps, color: 'var(--color-primary)', height: 140, ariaLabel: 'Steps over the last 7 days', interactive: true, tipFormat: (v) => v.toLocaleString() })
       )
     );
 
     mount(host, todayCard, weeklyCard);
+
+    // Celebrate the moment a goal crosses the line (not on every re-render).
+    if (prevWaterPct != null && prevWaterPct < 100 && waterPct >= 100) celebrate(waterBlock);
+    if (prevStepPct != null && prevStepPct < 100 && stepPct >= 100) celebrate(stepBlock);
+    prevWaterPct = waterPct;
+    prevStepPct = stepPct;
   }
 
   render();

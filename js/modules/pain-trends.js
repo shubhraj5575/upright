@@ -3,8 +3,9 @@
 
 import * as store from '../core/store.js';
 import { todayKey, addDays, parseKey } from '../core/dates.js';
-import { el, mount, clear, card, slider, toast } from '../core/ui.js';
-import { lineChart } from '../core/charts.js';
+import { el, mount, clear, card, slider, toast, pageHeader, segmented, emptyState } from '../core/ui.js';
+import { icon } from '../core/icons.js';
+import { lineChart, srTable } from '../core/charts.js';
 
 const KEY = 'painLog';
 const RANGES = [
@@ -62,8 +63,15 @@ export function init(mountEl) {
   const today = todayKey();
   const existing = (entries()[today]) || {};
 
-  const painS = slider({ id: 'pain', label: 'Pain', min: 0, max: 10, value: existing.pain ?? 0 });
-  const stiffS = slider({ id: 'stiff', label: 'Stiffness', min: 0, max: 10, value: existing.stiffness ?? 0 });
+  const painS = slider({
+    id: 'pain', label: 'Pain', min: 0, max: 10, value: existing.pain ?? 0,
+    format: (v) => `${v}/10`, anchors: ['None', 'Moderate', 'Worst imaginable'],
+  });
+  const stiffS = slider({
+    id: 'stiff', label: 'Stiffness', min: 0, max: 10, value: existing.stiffness ?? 0,
+    format: (v) => `${v}/10`, anchors: ['Loose', 'Stiff', 'Locked up'],
+  });
+  // Mood keeps emoji anchors deliberately — faces read faster than numbers here.
   const moodS = slider({
     id: 'mood', label: 'Mood (optional)', min: 1, max: 5, value: existing.mood ?? 3,
     format: (v) => ['—', '😞', '😕', '😐', '🙂', '😄'][v] || v,
@@ -86,6 +94,8 @@ export function init(mountEl) {
     }));
     toast('Pain entry saved.', { type: 'success' });
     savedHint.textContent = 'Saved — this updates today’s entry.';
+    saveBtn.replaceChildren(icon('check', { size: 16 }), ' Saved');
+    setTimeout(() => { saveBtn.replaceChildren('Save today’s entry'); }, 2000);
   }
 
   const formCard = card('How is your back today?',
@@ -99,26 +109,22 @@ export function init(mountEl) {
 
   // --- trends -------------------------------------------------------------
   const chartHost = el('div', {});
-  const rangeBtns = RANGES.map((r) =>
-    el('button', {
-      class: 'btn btn--sm' + (r.id === range.id ? ' btn--primary' : ''),
-      dataset: { range: r.id },
-      onClick: () => { range = r; renderChart(); syncRangeBtns(); },
-    }, r.label)
-  );
-  function syncRangeBtns() {
-    rangeBtns.forEach((b) => b.classList.toggle('btn--primary', b.dataset.range === range.id));
-  }
+  const rangeSeg = segmented({
+    ariaLabel: 'Trend range',
+    value: range.id,
+    options: RANGES.map((r) => ({ value: r.id, label: r.label })),
+    onChange: (id) => { range = RANGES.find((r) => r.id === id); renderChart(); },
+  });
 
   function renderChart() {
     const log = entries();
     clear(chartHost);
     if (loggedCount(log) < MIN_ENTRIES_FOR_CHART) {
-      mount(chartHost, el('div', { class: 'empty' },
-        el('div', { class: 'empty__icon', 'aria-hidden': 'true' }, '📈'),
-        el('div', { class: 'empty__title' }, 'Your trend will appear here'),
-        el('p', {}, `Log at least ${MIN_ENTRIES_FOR_CHART} days to see your pain and stiffness over time.`)
-      ));
+      mount(chartHost, emptyState({
+        icon: 'trending-up',
+        title: 'Your trend will appear here',
+        body: `Log at least ${MIN_ENTRIES_FOR_CHART} days to see your pain and stiffness over time.`,
+      }));
       return;
     }
     const { pain, stiff, avg, labels } = buildRange(log, range.days);
@@ -130,25 +136,30 @@ export function init(mountEl) {
       ],
       labels, yMin: 0, yMax: 10, yTicks: 5, height: 240,
       ariaLabel: `Pain and stiffness over the last ${range.label}`,
+      interactive: true, animate: true, gradientFill: true, markers: 'auto',
     });
     const legend = el('div', { class: 'chart-legend' },
       legendItem(PAIN_COLOR, 'Pain'),
       legendItem(STIFF_COLOR, 'Stiffness'),
       legendItem(AVG_COLOR, '7-day avg pain', true)
     );
-    mount(chartHost, chart, legend);
+    mount(chartHost, chart, legend, srTable({
+      caption: `Pain and stiffness, last ${range.label}`,
+      labels: buildRange(log, range.days).labels.map((l, i) => l || `day ${i + 1}`),
+      series: [{ label: 'Pain', values: pain }, { label: 'Stiffness', values: stiff }],
+    }));
   }
 
   const trendsCard = card('Trends',
     el('div', { class: 'row row--between', style: { marginBottom: 'var(--space-3)' } },
       el('span', { class: 'text-muted', style: { fontSize: 'var(--text-sm)' } }, 'Lower is better'),
-      el('div', { class: 'chart-ranges' }, ...rangeBtns)
+      rangeSeg.root
     ),
     chartHost
   );
 
   mount(mountEl,
-    el('div', { class: 'view-header' }, el('h1', {}, 'Pain & symptoms'), el('p', {}, 'Track how your back feels day to day.')),
+    pageHeader({ title: 'Pain & symptoms', sub: 'Track how your back feels day to day.' }),
     formCard,
     trendsCard
   );

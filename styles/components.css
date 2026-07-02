@@ -710,3 +710,184 @@
   .diag-row { grid-template-columns: 24px 1fr; }
   .diag-row__detail { grid-column: 2; }
 }
+
+/* --- dashboard hero -------------------------------------------------------- */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+.hero__metric { min-width: 200px; }
+.hero__value {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+}
+.hero__of { font-size: var(--text-xl); color: var(--color-text-faint); font-weight: var(--weight-medium); }
+.hero__label { color: var(--color-text-muted); font-size: var(--text-sm); margin-top: var(--space-1); }
+.hero__label--prompt {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+.hero__sub { color: var(--color-text-faint); font-size: var(--text-sm); margin-top: var(--space-1); }
+.hero__rings { display: flex; gap: var(--space-5); }
+.hero__ring { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+
+.streak-chip {
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Comfortable touch targets on the quick-log row. */
+.quick-actions .btn { min-height: 44px; }
+.posture-mini button {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+.posture-mini button:hover { color: var(--color-primary); }
+
+/* Posture check-in buttons (view version, with the figure icons). */
+.posture-btn svg { color: var(--color-text-muted); }
+.posture-btn:hover svg { color: var(--color-primary); }
+
+/* --- exercise timer ------------------------------------------------------- */
+.timer {
+  text-align: center;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-top: var(--space-3);
+}
+.timer__count {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.timer__count--hold { color: var(--color-primary); }
+.timer__count--done { color: var(--color-success-text); }
+.timer__phase { font-size: var(--text-sm); color: var(--color-text-muted); }
+.timer__dots { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-2); }
+.timer__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.timer__dot--active { background: var(--color-accent); transform: scale(1.25); }
+.timer__dot--done { background: var(--color-primary); }
+
+.ex-instructions { margin-top: var(--space-3); }
+.ex-instructions summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+}
+.ex-instructions summary:hover { color: var(--color-text); }
+
+/* --- thin progress bar ------------------------------------------------------ */
+.progress {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+.progress__fill {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: var(--color-primary);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+/* --- report stats + print ---------------------------------------------------- */
+.stat__value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+}
+.stat__label { color: var(--color-text-muted); font-size: var(--text-sm); }
+.print-header { display: none; }
+
+@media print {
+  @page { margin: 14mm; }
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #333;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+  .print-header strong { font-size: 15pt; }
+  .print-header span { font-size: 9pt; color: #555; }
+  .view-header { display: none; }
+  .card { page-break-inside: avoid; break-inside: avoid; }
+  .card + .card { margin-top: 10px; }
+  body { font-size: 10.5pt; }
+}
+
+/* --- settings sub-nav ------------------------------------------------------- */
+.settings-subnav {
+  position: sticky;
+  top: calc(var(--header-h) + var(--space-2));
+  z-index: 5;
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: var(--space-2);
+  margin-bottom: var(--space-4);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-full);
+}
+.settings-subnav::-webkit-scrollbar { display: none; }
+.settings-subnav__pill {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+.settings-subnav__pill:hover { color: var(--color-text); border-color: var(--color-border-strong); text-decoration: none; }
+.settings-subnav__pill--danger { color: var(--color-danger-text); }
+.settings-section { scroll-margin-top: calc(var(--header-h) + 64px); }
+
+/* --- onboarding -------------------------------------------------------------- */
+.onboarding { min-height: 180px; }
+.onboarding__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.onboarding__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.onboarding__dot--on { background: var(--color-primary); transform: scale(1.25); }

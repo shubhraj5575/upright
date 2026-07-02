@@ -6,7 +6,8 @@
 
 import * as store from '../core/store.js';
 import { todayKey } from '../core/dates.js';
-import { el, mount, clear, card, toast } from '../core/ui.js';
+import { el, mount, clear, card, toast, pageHeader, skeletonGrid, confirmDialog, openDialog, emptyState, setFieldError } from '../core/ui.js';
+import { icon } from '../core/icons.js';
 
 const KEY = 'exercises';
 const LOG_KEY = 'exerciseLog';
@@ -55,16 +56,17 @@ export function init(mountEl) {
   let audioCtx = null;
   const sets = {}; // id -> completed-set tally, in-memory for this view only
 
-  const header = el('div', { class: 'view-header' },
-    el('h1', {}, 'Rehab exercises'),
-    el('p', {}, 'A small set of gentle lower-back movements with built-in timers. Move within a comfortable, pain-free range.'));
+  const header = pageHeader({
+    title: 'Rehab exercises',
+    sub: 'Gentle lower-back movements with built-in timers. Move within a comfortable, pain-free range.',
+  });
   const disclaimer = el('div', { class: 'callout callout--warn', style: { marginBottom: 'var(--space-4)' } },
     el('div', { class: 'callout__title' }, '⚠ Generic examples only'),
     el('p', {}, 'These are common rehab exercises, not a prescription. Always follow the specific exercises, sets and limits your physiotherapist gave you — and stop anything that increases your pain.'));
   const host = el('div', { class: 'stack' });
 
   mount(mountEl, header, disclaimer, host);
-  mount(host, el('p', { style: { color: 'var(--color-text-muted)' } }, 'Loading exercises…'));
+  mount(host, skeletonGrid(4));
 
   // --- audio ---------------------------------------------------------------
   // Lazily create one shared AudioContext on the first user gesture (Start),
@@ -101,8 +103,11 @@ export function init(mountEl) {
     const hold = ex.holdSec || 0;
     const rest = ex.restSec || 0;
 
-    const big = el('div', { style: { fontSize: 'var(--text-3xl)', fontWeight: 'var(--weight-bold)', fontVariantNumeric: 'tabular-nums', lineHeight: '1.1' } });
-    const phaseLbl = el('div', { style: { fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' } });
+    const big = el('div', { class: 'timer__count' });
+    const phaseLbl = el('div', { class: 'timer__phase' });
+    // One dot per set — fills as sets complete, so progress reads at a glance.
+    const dots = Array.from({ length: total }, () => el('span', { class: 'timer__dot' }));
+    const dotsRow = el('div', { class: 'timer__dots', 'aria-hidden': 'true' }, ...dots);
 
     let intId = null;
     let phase = 'idle'; // 'idle' | 'hold' | 'rest' | 'done'
@@ -113,6 +118,12 @@ export function init(mountEl) {
       if (phase === 'idle') { big.textContent = '—'; phaseLbl.textContent = 'Ready'; }
       else if (phase === 'done') { big.textContent = '✓'; phaseLbl.textContent = 'All sets complete'; }
       else { big.textContent = `${remaining}s`; phaseLbl.textContent = `${phase === 'hold' ? 'Hold' : 'Rest'} — set ${setNo} of ${total}`; }
+      big.classList.toggle('timer__count--hold', phase === 'hold');
+      big.classList.toggle('timer__count--done', phase === 'done');
+      dots.forEach((d, i) => {
+        d.classList.toggle('timer__dot--done', phase === 'done' || i < setNo - 1);
+        d.classList.toggle('timer__dot--active', phase !== 'idle' && phase !== 'done' && i === setNo - 1);
+      });
       startBtn.textContent = intId ? 'Pause' : (phase === 'idle' || phase === 'done' ? 'Start' : 'Resume');
     }
 
@@ -161,9 +172,10 @@ export function init(mountEl) {
 
     paint();
 
-    return el('div', { style: { textAlign: 'center', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', padding: 'var(--space-3)' } },
+    return el('div', { class: 'timer' },
       big,
       phaseLbl,
+      dotsRow,
       el('div', { class: 'row', style: { justifyContent: 'center', marginTop: 'var(--space-2)' } }, startBtn, resetBtn));
   }
 
@@ -182,14 +194,13 @@ export function init(mountEl) {
       ? `${ex.defaultSets || 1} × hold ${ex.holdSec}s`
       : `${ex.defaultSets || 1} × ${ex.defaultReps || 0} reps`;
 
-    // collapsible instructions
-    const list = el('ul', { style: { display: 'none', margin: 'var(--space-2) 0 0', paddingLeft: 'var(--space-5)', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' } },
-      ...(ex.instructions || []).map((s) => el('li', { style: { marginBottom: 'var(--space-1)' } }, s)));
-    const toggleBtn = el('button', { class: 'btn btn--ghost btn--sm', onClick: () => {
-      const open = list.style.display !== 'none';
-      list.style.display = open ? 'none' : 'block';
-      toggleBtn.textContent = open ? 'Show instructions' : 'Hide instructions';
-    } }, 'Show instructions');
+    // collapsible instructions — native <details> gets keyboard/SR for free
+    const instructions = (ex.instructions || []).length
+      ? el('details', { class: 'ex-instructions' },
+          el('summary', {}, 'Instructions'),
+          el('ul', { style: { margin: 'var(--space-2) 0 0', paddingLeft: 'var(--space-5)', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' } },
+            ...(ex.instructions || []).map((s) => el('li', { style: { marginBottom: 'var(--space-1)' } }, s))))
+      : null;
 
     // sets tally
     const tallyN = el('span', { class: 'badge badge--primary' }, `${sets[ex.id] || 0} sets done`);
@@ -203,14 +214,21 @@ export function init(mountEl) {
     } }, 'Clear');
 
     const doneBtn = el('button', { class: 'btn btn--sm' + (done ? '' : ' btn--primary'),
-      onClick: () => toggleDone(ex.id) }, done ? '✓ Done today' : 'Mark done today');
+      onClick: () => toggleDone(ex.id) }, done ? [icon('check', { size: 14 }), ' Done today'] : 'Mark done today');
 
     const actions = el('div', { class: 'row', style: { flexWrap: 'wrap', marginTop: 'var(--space-3)' } }, doneBtn, tallyBtn, tallyN, tallyReset);
 
     if (isCustom(ex)) {
       actions.appendChild(el('button', { class: 'btn btn--ghost btn--sm',
-        onClick: () => { wrap.replaceChildren(openEditor(ex, () => wrap.replaceChildren(exerciseCard(ex, wrap)))); } }, 'Edit'));
-      actions.appendChild(el('button', { class: 'btn btn--danger btn--sm', onClick: () => deleteCustom(ex.id) }, 'Delete'));
+        onClick: () => openEditorDialog(ex) }, icon('edit', { size: 14 }), ' Edit'));
+      actions.appendChild(el('button', { class: 'btn btn--danger btn--sm', onClick: async () => {
+        const yes = await confirmDialog({
+          title: `Delete “${ex.name}”?`,
+          body: 'This removes the exercise from your library. Days you already marked it done stay in your history.',
+          confirmLabel: 'Delete', danger: true,
+        });
+        if (yes) deleteCustom(ex.id);
+      } }, icon('trash', { size: 14 }), ' Delete'));
     }
 
     return card(null,
@@ -223,13 +241,12 @@ export function init(mountEl) {
           el('p', { style: { fontStyle: 'italic', color: 'var(--color-text-muted)', margin: 0 } }, ex.cue || ''),
           el('p', { style: { fontWeight: 'var(--weight-medium)', marginTop: 'var(--space-2)' } }, repInfo))),
       makeTimer(ex),
-      el('div', { style: { marginTop: 'var(--space-3)' } }, toggleBtn, list),
+      instructions,
       actions);
   }
 
-  // --- custom add / edit ---------------------------------------------------
-  // `onDone` (edit-in-place only) restores the exercise card after Save/Cancel.
-  function openEditor(existing, onDone) {
+  // --- custom add / edit (in a dialog) --------------------------------------
+  function openEditorDialog(existing) {
     const name = el('input', { class: 'input', placeholder: 'Exercise name' });
     const cat = el('input', { class: 'input', placeholder: 'Category, e.g. Mobility' });
     const setsIn = el('input', { class: 'input', type: 'number', min: '1', step: '1', value: '2' });
@@ -245,13 +262,15 @@ export function init(mountEl) {
       instr.value = (existing.instructions || []).join('\n');
     }
 
+    const nameField = el('div', { class: 'field', style: { marginBottom: 0 } }, el('label', {}, 'Name'), name);
     function field(label, node) {
       return el('div', { class: 'field', style: { marginBottom: 0 } }, el('label', {}, label), node);
     }
 
     function onSave() {
       const nm = name.value.trim();
-      if (!nm) { toast('Give the exercise a name.', { type: 'warn' }); return; }
+      if (!nm) { setFieldError(nameField, 'Give the exercise a name.'); return false; }
+      setFieldError(nameField, null);
       const obj = {
         id: existing ? existing.id : `custom-${slug(nm)}-${Date.now()}`,
         name: nm,
@@ -275,18 +294,23 @@ export function init(mountEl) {
         return arr;
       });
       toast(existing ? 'Exercise updated.' : 'Exercise added.', { type: 'success' });
-      if (onDone) onDone();
+      return true;
     }
 
-    return card(existing ? `Edit ${existing.name}` : 'Add your own exercise',
-      el('div', { class: 'grid' },
-        field('Name', name), field('Category', cat),
-        field('Sets', setsIn), field('Reps (0 if hold-based)', repsIn),
-        field('Hold seconds (0 if rep-based)', holdIn)),
-      el('div', { class: 'field', style: { marginTop: 'var(--space-4)' } }, el('label', {}, 'Instructions'), instr),
-      el('div', { class: 'row' },
-        el('button', { class: 'btn btn--primary', onClick: onSave }, existing ? 'Save changes' : 'Add exercise'),
-        onDone ? el('button', { class: 'btn btn--ghost', onClick: () => onDone() }, 'Cancel') : null));
+    const saveBtn = el('button', { class: 'btn btn--primary', onClick: () => { if (onSave()) handle.close(); } },
+      existing ? 'Save changes' : 'Add exercise');
+    const cancelBtn = el('button', { class: 'btn btn--ghost', onClick: () => handle.close() }, 'Cancel');
+    const handle = openDialog({
+      title: existing ? `Edit ${existing.name}` : 'Add your own exercise',
+      content: el('div', {},
+        el('div', { class: 'grid' },
+          nameField, field('Category', cat),
+          field('Sets', setsIn), field('Reps (0 if hold-based)', repsIn),
+          field('Hold seconds (0 if rep-based)', holdIn)),
+        el('div', { class: 'field', style: { marginTop: 'var(--space-4)', marginBottom: 0 } }, el('label', {}, 'Instructions'), instr)),
+      actions: [cancelBtn, saveBtn],
+    });
+    name.focus();
   }
 
   function deleteCustom(id) {
@@ -294,30 +318,28 @@ export function init(mountEl) {
     toast('Exercise removed.', { type: 'info' });
   }
 
-  // --- reset library (inline confirm, mirroring Settings) ------------------
-  function resetCard() {
-    const inner = el('div', {});
-    function idle() {
-      return el('button', { class: 'btn btn--danger', onClick: () => { inner.replaceChildren(confirmReset()); } }, 'Reset library to starter…');
-    }
-    function confirmReset() {
-      return el('div', { class: 'callout callout--warn' },
-        el('p', {}, el('strong', {}, 'This replaces the whole library with the starter exercises'), ' and removes any custom ones you added.'),
-        el('div', { class: 'row', style: { marginTop: 'var(--space-3)' } },
-          el('button', { class: 'btn btn--ghost', onClick: () => { inner.replaceChildren(idle()); } }, 'Cancel'),
-          el('button', { class: 'btn btn--danger', onClick: async () => {
-            try {
-              const seed = await loadSeed();
-              if (torn) return;
-              store.set(KEY, seed);
-              toast('Library reset to starter exercises.', { type: 'info' });
-            } catch (_) {
-              toast('Could not load the starter exercises.', { type: 'error' });
-            }
-          } }, 'Yes, reset library')));
-    }
-    inner.appendChild(idle());
-    return card('Reset library', inner);
+  // --- library management ----------------------------------------------------
+  function libraryCard() {
+    return card('Your library',
+      el('p', { class: 'card__subtitle' }, 'Add the exact exercises your physio prescribed, or reset to the starter set.'),
+      el('div', { class: 'row' },
+        el('button', { class: 'btn btn--primary', onClick: () => openEditorDialog(null) }, icon('plus', { size: 16 }), 'Add your own exercise'),
+        el('button', { class: 'btn btn--ghost', onClick: async () => {
+          const yes = await confirmDialog({
+            title: 'Reset library to starter?',
+            body: 'This replaces the whole library with the starter exercises and removes any custom ones you added.',
+            confirmLabel: 'Reset library', danger: true,
+          });
+          if (!yes) return;
+          try {
+            const seed = await loadSeed();
+            if (torn) return;
+            store.set(KEY, seed);
+            toast('Library reset to starter exercises.', { type: 'info' });
+          } catch (_) {
+            toast('Could not load the starter exercises.', { type: 'error' });
+          }
+        } }, 'Reset to starter…')));
   }
 
   // --- render --------------------------------------------------------------
@@ -329,8 +351,15 @@ export function init(mountEl) {
     clear(host);
 
     const list = library();
+    if (!list.length) {
+      mount(host, emptyState({
+        icon: 'dumbbell',
+        title: 'No exercises yet',
+        body: 'Add the movements your physio gave you, or reset to the starter set below.',
+      }));
+    }
     mount(host, ...list.map((ex) => exerciseSlot(ex)));
-    mount(host, openEditor(null), resetCard());
+    mount(host, libraryCard());
   }
 
   // --- async seed-then-build ----------------------------------------------
@@ -343,10 +372,11 @@ export function init(mountEl) {
       } catch (_) {
         if (torn) return;
         clear(host);
-        mount(host, el('div', { class: 'empty' },
-          el('div', { class: 'empty__icon', 'aria-hidden': 'true' }, '⚠'),
-          el('div', { class: 'empty__title' }, 'Couldn’t load exercises'),
-          el('p', {}, 'The starter exercises failed to load. Check your connection and reopen this page.')));
+        mount(host, emptyState({
+          icon: 'alert-triangle',
+          title: 'Couldn’t load exercises',
+          body: 'The starter exercises failed to load. Check your connection and reopen this page.',
+        }));
         return;
       }
     }

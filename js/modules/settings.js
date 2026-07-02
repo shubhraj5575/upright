@@ -8,7 +8,8 @@ import * as store from '../core/store.js';
 import * as backup from '../core/backup.js';
 import * as notify from '../core/notify.js';
 import { mergeSettings } from '../core/schema.js';
-import { el, mount, card, toast, slider } from '../core/ui.js';
+import { el, mount, card, toast, slider, pageHeader, segmented, setFieldError, openDialog } from '../core/ui.js';
+import { icon } from '../core/icons.js';
 import { applyTheme } from '../core/theme.js';
 import { resetReminderClock } from './posture-reminders.js';
 
@@ -66,15 +67,20 @@ function disclaimerCard() {
 
 function appearanceCard() {
   const cur = settings().theme || 'system';
-  const radios = ['system', 'light', 'dark'].map((t) => {
-    const input = el('input', { type: 'radio', name: 'theme', value: t, checked: t === cur,
-      onChange: () => { patch((n) => { n.theme = t; }); applyTheme(t); } });
-    return el('label', {}, input, ' ', t[0].toUpperCase() + t.slice(1));
+  const seg = segmented({
+    ariaLabel: 'Theme',
+    value: cur,
+    options: [
+      { value: 'system', label: 'System', icon: 'sliders' },
+      { value: 'light', label: 'Light', icon: 'sun' },
+      { value: 'dark', label: 'Dark', icon: 'moon' },
+    ],
+    onChange: (t) => { patch((n) => { n.theme = t; }); applyTheme(t); },
   });
   return card('Appearance',
     el('div', { class: 'field', style: { marginBottom: 0 } },
       el('label', {}, 'Theme'),
-      el('div', { class: 'radio-row' }, ...radios),
+      seg.root,
       el('span', { class: 'field__hint' }, '“System” follows your device’s light/dark setting.'))
   );
 }
@@ -239,32 +245,55 @@ function dataCard() {
 }
 
 function dangerCard() {
-  const host = el('div', {});
-  function idle() {
-    return el('button', { class: 'btn btn--danger', onClick: () => { host.replaceChildren(confirm()); } }, 'Reset all data…');
+  function openResetDialog() {
+    const backupCheck = el('input', { type: 'checkbox' });
+    const eraseBtn = el('button', { class: 'btn btn--danger', disabled: true, onClick: () => {
+      handle.close();
+      store.clearAll();
+      store.ensureSeeded();
+      toast('All data has been reset.', { type: 'info' });
+      location.hash = '#/dashboard';
+    } }, 'Erase everything');
+    backupCheck.addEventListener('change', () => { eraseBtn.disabled = !backupCheck.checked; });
+    const handle = openDialog({
+      title: 'Reset all data?',
+      content: el('div', {},
+        el('p', { class: 'dialog__text' }, 'This permanently deletes all your logs, settings and plans on this device. There is no undo.'),
+        el('label', { class: 'row', style: { gap: 'var(--space-2)', marginTop: 'var(--space-4)' } },
+          backupCheck, ' I have a recent backup (or I don’t need one)')),
+      actions: [
+        el('button', { class: 'btn btn--ghost', onClick: () => handle.close() }, 'Cancel'),
+        eraseBtn,
+      ],
+    });
   }
-  function confirm() {
-    return el('div', { class: 'callout callout--warn' },
-      el('p', {}, el('strong', {}, 'This permanently deletes all your logs, settings and plans on this device.')),
-      el('p', { class: 'field__hint' }, 'Consider exporting a backup first.'),
-      el('div', { class: 'row', style: { marginTop: 'var(--space-3)' } },
-        el('button', { class: 'btn btn--ghost', onClick: () => { host.replaceChildren(idle()); } }, 'Cancel'),
-        el('button', { class: 'btn btn--danger', onClick: () => {
-          store.clearAll();
-          store.ensureSeeded();
-          toast('All data has been reset.', { type: 'info' });
-          location.hash = '#/dashboard';
-        } }, 'Yes, erase everything')));
-  }
-  host.appendChild(idle());
-  return card('Danger zone', host);
+  return card('Danger zone',
+    el('p', { class: 'card__subtitle' }, 'Irreversible actions live here, well away from everything else.'),
+    el('button', { class: 'btn btn--danger', onClick: openResetDialog }, icon('trash', { size: 16 }), 'Reset all data…'));
 }
 
 // --- small field helpers --------------------------------------------------
+// Numbers are validated inline and clamped into range — an out-of-range value
+// shows what was actually saved instead of silently persisting nonsense.
 function numberField(label, value, min, max, step, onChange) {
-  const input = el('input', { class: 'input', type: 'number', min, max, step, value,
-    onChange: (e) => { const v = Number(e.target.value); if (!Number.isNaN(v)) onChange(v); } });
-  return el('div', { class: 'field', style: { marginBottom: 0 } }, el('label', {}, label), input);
+  const input = el('input', { class: 'input', type: 'number', min, max, step, value });
+  const field = el('div', { class: 'field', style: { marginBottom: 0 } }, el('label', {}, label), input);
+  input.addEventListener('change', (e) => {
+    const v = Number(e.target.value);
+    if (e.target.value.trim() === '' || Number.isNaN(v)) {
+      setFieldError(field, `Enter a number between ${min} and ${max}.`);
+      return;
+    }
+    const clamped = Math.min(max, Math.max(min, v));
+    if (clamped !== v) {
+      e.target.value = clamped;
+      setFieldError(field, `Adjusted to ${clamped} (allowed range ${min}–${max}).`);
+    } else {
+      setFieldError(field, null);
+    }
+    onChange(clamped);
+  });
+  return field;
 }
 function timeField(label, value, onChange) {
   const input = el('input', { class: 'input', type: 'time', value, onChange: (e) => onChange(e.target.value) });
@@ -272,16 +301,35 @@ function timeField(label, value, onChange) {
 }
 
 export function init(mountEl) {
+  // Sticky pill sub-nav: settings is long; one tap jumps to a section.
+  const sections = [
+    { id: 'safety', label: 'Safety', node: disclaimerCard() },
+    { id: 'appearance', label: 'Appearance', node: appearanceCard() },
+    { id: 'reminders', label: 'Reminders', node: remindersCard() },
+    { id: 'goals', label: 'Goals', node: goalsCard() },
+    { id: 'camera', label: 'Camera', node: cameraCard() },
+    { id: 'streaks', label: 'Streaks', node: streakCard() },
+    { id: 'physio', label: 'Physio', node: physioCard() },
+    { id: 'data', label: 'Data', node: dataCard() },
+    { id: 'danger', label: 'Danger', node: dangerCard() },
+  ];
+  for (const s of sections) {
+    s.node.id = `set-${s.id}`;
+    s.node.classList.add('settings-section');
+  }
+  const subnav = el('nav', { class: 'settings-subnav no-print', 'aria-label': 'Settings sections' },
+    ...sections.map((s) => el('a', {
+      class: 'settings-subnav__pill' + (s.id === 'danger' ? ' settings-subnav__pill--danger' : ''),
+      href: `#/settings`,
+      onClick: (e) => {
+        e.preventDefault();
+        document.getElementById(`set-${s.id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    }, s.label)));
+
   mount(mountEl,
-    el('div', { class: 'view-header' }, el('h1', {}, 'Settings'), el('p', {}, 'Make Upright fit your recovery. Everything here is saved on this device.')),
-    disclaimerCard(),
-    appearanceCard(),
-    remindersCard(),
-    goalsCard(),
-    cameraCard(),
-    streakCard(),
-    physioCard(),
-    dataCard(),
-    dangerCard()
+    pageHeader({ title: 'Settings', sub: 'Make Upright fit your recovery. Everything here is saved on this device.' }),
+    subnav,
+    ...sections.map((s) => s.node)
   );
 }
