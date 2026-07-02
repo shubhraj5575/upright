@@ -57,7 +57,8 @@ function setLast(field, iso) {
   store.update(STATE_KEY, (st) => ({ ...(st || {}), [field]: iso }));
 }
 
-function withinActiveHours(now, r) {
+// Exported so the camera alert ladder respects the same quiet hours.
+export function withinActiveHours(now, r) {
   if (!r.activeHours) return true;
   const toMin = (hhmm) => { const [h, m] = String(hhmm).split(':').map(Number); return h * 60 + m; };
   const mins = now.getHours() * 60 + now.getMinutes();

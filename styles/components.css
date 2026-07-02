@@ -631,3 +631,82 @@
   .chart__tick { fill: #555; }
   .chart__grid { stroke: #ddd; }
 }
+
+/* --- camera v2: stage, overlay, gauge, profiles, diagnostics ------------- */
+.cam-stage {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+.cam-video { margin-top: 0; }
+.cam-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1); /* same mirror as the video, so coords line up */
+  pointer-events: none;
+}
+.cam-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+  min-width: 140px;
+}
+.cam-gauge .ring { display: block; }
+.cam-snooze {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cam-profile {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+
+.cam-diag { margin-top: var(--space-4); }
+.cam-diag summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cam-diag summary:hover { color: var(--color-text); }
+.cam-diag__body { margin-top: var(--space-3); }
+.cam-diag__body > .btn { margin: var(--space-2) 0 var(--space-3); }
+.diag-list { display: grid; gap: 2px; }
+.diag-row {
+  display: grid;
+  grid-template-columns: 24px minmax(140px, 180px) 1fr;
+  gap: var(--space-2);
+  align-items: start;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+.diag-row__state { display: inline-flex; justify-content: center; padding-top: 1px; }
+.diag-row__label { font-weight: var(--weight-medium); }
+.diag-row__detail { color: var(--color-text-muted); font-size: var(--text-xs); }
+.diag-row--pending { color: var(--color-text-faint); }
+.diag-row--pass .diag-row__state { color: var(--color-success-text); }
+.diag-row--warn { background: var(--color-warn-soft); }
+.diag-row--warn .diag-row__state { color: var(--color-warn-text); }
+.diag-row--fail { background: var(--color-danger-soft); }
+.diag-row--fail .diag-row__state { color: var(--color-danger-text); }
+.diag-row--skip { opacity: 0.6; }
+
+@media (max-width: 560px) {
+  .diag-row { grid-template-columns: 24px 1fr; }
+  .diag-row__detail { grid-column: 2; }
+}

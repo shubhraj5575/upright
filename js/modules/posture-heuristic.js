@@ -59,6 +59,70 @@ export function computeMetrics(keypoints, minScore = 0.3) {
   };
 }
 
+/**
+ * The tolerance thresholds evaluate() applies for a given sensitivity —
+ * exported so the live score can express "how close to the line am I".
+ * @param {number} [sensitivity] 0..1
+ * @returns {{ slouch:number, tilt:number }}
+ */
+export function thresholds(sensitivity = 0.5) {
+  const s = Math.max(0, Math.min(1, sensitivity));
+  return {
+    slouch: 0.30 - 0.22 * s, // s=0→0.30, 0.5→0.19, 1→0.08
+    tilt: 0.22 - 0.12 * s, // shoulder tilt / lateral tolerance
+  };
+}
+
+/**
+ * How confidently the upper body is visible, 0..1 — the mean detection score
+ * of the keypoints the heuristic actually uses (shoulders anchor everything,
+ * so they count double). Used to gate calibration samples.
+ * @param {{x:number,y:number,score:number}[]} keypoints
+ */
+export function keypointQuality(keypoints) {
+  if (!Array.isArray(keypoints)) return 0;
+  const sc = (i) => {
+    const k = keypoints[i];
+    return k && typeof k.score === 'number' ? Math.max(0, Math.min(1, k.score)) : 0;
+  };
+  const head = Math.max(
+    (sc(KP.leftEar) + sc(KP.rightEar)) / 2,
+    (sc(KP.leftEye) + sc(KP.rightEye)) / 2,
+    sc(KP.nose)
+  );
+  return (sc(KP.leftShoulder) * 2 + sc(KP.rightShoulder) * 2 + head) / 5;
+}
+
+/**
+ * Combine calibration samples into a baseline, rejecting unusable captures
+ * with a specific reason instead of silently averaging garbage.
+ *  - too-few:  not enough clean samples (caller decides why: low light etc.)
+ *  - moved:    samples vary too much — the user shifted during capture.
+ * @param {object[]} samples  metrics from computeMetrics()
+ * @param {{ minSamples?:number, maxSpread?:{verticalGap:number, lateralOffset:number, shoulderTilt:number} }} [opts]
+ * @returns {{ ok:true, baseline:object } | { ok:false, reason:'too-few'|'moved', spread?:object }}
+ */
+export function aggregateBaseline(samples, opts = {}) {
+  const minSamples = opts.minSamples ?? 6;
+  const maxSpread = opts.maxSpread || { verticalGap: 0.28, lateralOffset: 0.22, shoulderTilt: 0.14 };
+  const clean = (samples || []).filter(Boolean);
+  if (clean.length < minSamples) return { ok: false, reason: 'too-few' };
+
+  const axes = ['verticalGap', 'lateralOffset', 'shoulderTilt'];
+  const mean = {};
+  const spread = {};
+  for (const a of axes) {
+    const vals = clean.map((m) => m[a]);
+    mean[a] = vals.reduce((s, v) => s + v, 0) / vals.length;
+    const sd = Math.sqrt(vals.reduce((s, v) => s + (v - mean[a]) ** 2, 0) / vals.length);
+    spread[a] = sd;
+  }
+  for (const a of axes) {
+    if (spread[a] > maxSpread[a]) return { ok: false, reason: 'moved', spread };
+  }
+  return { ok: true, baseline: makeBaseline(mean) };
+}
+
 /** A baseline is just the metrics captured while sitting tall. */
 export function makeBaseline(metrics) {
   if (!metrics) return null;
@@ -86,9 +150,8 @@ export function evaluate(metrics, baseline, sensitivity = 0.5) {
   const tilt = Math.abs(metrics.shoulderTilt - baseline.shoulderTilt);
   const lateral = Math.abs(metrics.lateralOffset - baseline.lateralOffset);
 
-  // Thresholds tighten as sensitivity rises.
-  const slouchThresh = 0.30 - 0.22 * s; // s=0→0.30, 0.5→0.19, 1→0.08
-  const tiltThresh = 0.22 - 0.12 * s; // shoulder tilt / lateral tolerance
+  // Thresholds tighten as sensitivity rises (shared with the live score).
+  const { slouch: slouchThresh, tilt: tiltThresh } = thresholds(s);
 
   const issues = [];
   if (drop > slouchThresh) issues.push('slouch');

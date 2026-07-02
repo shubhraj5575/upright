@@ -50,3 +50,35 @@ export function fire(title, opts = {}) {
   toast(`${title}${body ? ' — ' + body : ''}`, { type, duration: toastDuration, action: onClick ? { label: 'Open', onClick } : undefined });
   return { via: 'toast' };
 }
+
+// --- chime ------------------------------------------------------------------
+// A soft two-note WebAudio chime (opt-in, used by the camera alert ladder).
+// No audio assets; a couple of sine oscillators with a gentle envelope.
+let audioCtx = null;
+
+export function chime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return false;
+    if (!audioCtx) audioCtx = new Ctx();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    const t0 = audioCtx.currentTime;
+    const note = (freq, at, dur) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t0 + at);
+      gain.gain.linearRampToValueAtTime(0.12, t0 + at + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t0 + at);
+      osc.stop(t0 + at + dur + 0.05);
+    };
+    note(660, 0, 0.28); // E5
+    note(880, 0.16, 0.34); // A5
+    return true;
+  } catch (_) {
+    return false;
+  }
+}

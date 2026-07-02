@@ -8,7 +8,7 @@
 //
 // Bump CACHE_VERSION whenever shipping changed assets to retire old caches.
 
-const CACHE_VERSION = 'upright-v2-p3';
+const CACHE_VERSION = 'upright-v2-p4';
 
 const SHELL = [
   './',
@@ -37,6 +37,12 @@ const SHELL = [
   'js/modules/posture-reminders.js',
   'js/modules/posture-camera.js',
   'js/modules/posture-heuristic.js',
+  'js/modules/posture-score.js',
+  'js/modules/cam-pipeline.js',
+  'js/modules/cam-overlay.js',
+  'js/modules/cam-session.js',
+  'js/modules/alert-ladder.js',
+  'js/modules/cam-diagnostics.js',
   'js/modules/settings.js',
   'js/modules/ergo-sleep-guide.js',
   'js/modules/exercises.js',

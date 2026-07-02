@@ -138,15 +138,25 @@ function cameraCard() {
   const enable = el('input', { type: 'checkbox', checked: !!c.enabled,
     onChange: (e) => { patch((n) => { n.postureCamera.enabled = e.target.checked; });
       toast('Saved — open Posture to use the camera.', { type: 'info' }); } });
+  const overlay = el('input', { type: 'checkbox', checked: c.overlay !== false,
+    onChange: (e) => patch((n) => { n.postureCamera.overlay = e.target.checked; }) });
+  const sound = el('input', { type: 'checkbox', checked: !!(c.alerts || {}).sound,
+    onChange: (e) => patch((n) => { n.postureCamera.alerts.sound = e.target.checked; }) });
   const sens = slider({ id: 'cam-sens', label: 'Slouch sensitivity', min: 0, max: 1, step: 0.05,
     value: c.sensitivity ?? 0.5,
     format: (v) => (v < 0.34 ? 'Relaxed' : v < 0.67 ? 'Balanced' : 'Strict'),
+    anchors: ['Relaxed', 'Balanced', 'Strict'],
     onInput: (v) => patch((n) => { n.postureCamera.sensitivity = v; }) });
   return card('Camera posture AI',
     el('p', { class: 'card__subtitle' }, 'Optional. Uses your webcam on-device to flag slouching. '
       + 'Frames never leave your device and are never stored.'),
-    el('label', { class: 'row', style: { gap: 'var(--space-2)' } }, enable, ' Enable camera posture monitoring'),
-    el('div', { style: { marginTop: 'var(--space-4)', maxWidth: '360px' } }, sens.field)
+    el('div', { class: 'stack', style: { gap: 'var(--space-2)' } },
+      el('label', { class: 'row', style: { gap: 'var(--space-2)' } }, enable, ' Enable camera posture monitoring'),
+      el('label', { class: 'row', style: { gap: 'var(--space-2)', marginTop: 'var(--space-2)' } }, overlay, ' Show the skeleton overlay on the live video'),
+      el('label', { class: 'row', style: { gap: 'var(--space-2)', marginTop: 'var(--space-2)' } }, sound, ' Play a soft chime with slouch notifications')),
+    el('div', { style: { marginTop: 'var(--space-4)', maxWidth: '360px' } }, sens.field),
+    el('p', { class: 'field__hint', style: { marginTop: 'var(--space-3)' } },
+      'Camera acting up? ', el('a', { href: '#/posture?diag=1' }, 'Test camera setup →'))
   );
 }
 

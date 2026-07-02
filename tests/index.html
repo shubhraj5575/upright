@@ -29,9 +29,13 @@
     import backupSuite from './backup.test.js';
     import postureSuite from './posture-heuristic.test.js';
     import schemaSuite from './schema.test.js';
+    import scoreSuite from './posture-score.test.js';
+    import camSessionSuite from './cam-session.test.js';
+    import ladderSuite from './alert-ladder.test.js';
+    import diagSuite from './cam-diagnostics.test.js';
 
     const out = document.getElementById('out');
-    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite];
+    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite, scoreSuite, camSessionSuite, ladderSuite, diagSuite];
     let total = 0, failed = 0;
 
     for (const s of suites) {

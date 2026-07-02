@@ -8,6 +8,7 @@ import { el, mount, clear, card, statTile, toast } from '../core/ui.js';
 import * as pain from './pain-trends.js';
 import * as goals from './goals.js';
 import * as posture from './posture-reminders.js';
+import * as postureCamera from './posture-camera.js';
 import * as exercises from './exercises.js';
 import * as mealLog from './meal-log.js';
 
@@ -147,6 +148,17 @@ export function init(mountEl) {
         sub: ml.countToday ? 'today' : 'None logged today',
       })
     );
+
+    // Camera tile only appears on days the camera actually monitored.
+    const cam = safeSummary(postureCamera);
+    if (cam && cam.monitoredMin > 0) {
+      tiles.appendChild(statTile({
+        iconName: 'video', label: 'Camera posture', href: '#/posture',
+        value: cam.pctGood != null ? `${cam.pctGood}%` : '—',
+        sub: `good over ${cam.monitoredMin} min${cam.slouchEvents ? ` · ${cam.slouchEvents} slouch alert${cam.slouchEvents === 1 ? '' : 's'}` : ''}`,
+        accent: cam.pctGood != null && cam.pctGood >= 75 ? 'var(--color-primary)' : null,
+      }));
+    }
     mount(host, tiles);
 
     if (streak > 0) {

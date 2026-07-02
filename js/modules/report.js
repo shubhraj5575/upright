@@ -6,6 +6,7 @@ import * as store from '../core/store.js';
 import { todayKey, addDays, parseKey } from '../core/dates.js';
 import { el, mount, card } from '../core/ui.js';
 import { lineChart } from '../core/charts.js';
+import { summarizeDay } from './cam-session.js';
 
 function lastKeys(days) {
   const keys = [];
@@ -110,6 +111,48 @@ function goalsSection() {
   );
 }
 
+function cameraSection() {
+  const log = store.get('postureCamLog') || {};
+  const keys = lastKeys(14);
+  let monitoredMs = 0, goodMs = 0, slouchEvents = 0, daysUsed = 0;
+  const pctByDay = [];
+  for (const k of keys) {
+    const d = log[k];
+    if (d && d.monitoredMs > 0) {
+      daysUsed++;
+      monitoredMs += d.monitoredMs;
+      goodMs += d.goodMs || 0;
+      slouchEvents += d.slouchEvents || 0;
+      pctByDay.push(summarizeDay(d).pctGood);
+    } else {
+      pctByDay.push(null);
+    }
+  }
+  if (!daysUsed) return null; // camera not in use — keep the report tight
+  const pctGood = monitoredMs > 0 ? Math.round((goodMs / monitoredMs) * 100) : null;
+  const body = el('div', {},
+    el('div', { class: 'row', style: { gap: 'var(--space-6)', flexWrap: 'wrap' } },
+      stat('Time monitored (14d)', `${(monitoredMs / 3600000).toFixed(1)} h`),
+      stat('Good posture share', pctGood == null ? '—' : `${pctGood}%`),
+      stat('Slouch alerts', String(slouchEvents)),
+      stat('Days used', `${daysUsed} / 14`)
+    )
+  );
+  if (daysUsed >= 2) {
+    const step = Math.ceil(14 / 7);
+    const labels = keys.map((k, i) => (i % step === 0 || i === 13 ? parseKey(k).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''));
+    mount(body, el('div', { style: { marginTop: 'var(--space-3)' } },
+      lineChart({
+        series: [{ values: pctByDay, color: 'var(--color-primary)', label: '% good', fill: true }],
+        labels, yMin: 0, yMax: 100, yTicks: 4, height: 170,
+        ariaLabel: 'Camera-measured share of time with good posture, last 14 days',
+      })));
+  }
+  mount(body, el('p', { class: 'text-faint', style: { fontSize: 'var(--text-xs)', marginTop: 'var(--space-2)' } },
+    'Measured on-device by the optional webcam monitor against the user’s own calibrated “tall” posture. No video is stored.'));
+  return card('Camera posture monitoring (last 14 days)', body);
+}
+
 function stat(label, value) {
   return el('div', {},
     el('div', { style: { fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-bold)' } }, value),
@@ -134,6 +177,7 @@ export function init(mountEl) {
     painSection(),
     exerciseSection(),
     goalsSection(),
+    cameraSection(),
     el('p', { class: 'text-faint', style: { fontSize: 'var(--text-xs)', marginTop: 'var(--space-4)' } },
       'Upright is a self-tracking wellness tool, not a medical record or medical advice. '
       + 'Figures are self-reported.')
