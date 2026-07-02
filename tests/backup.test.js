@@ -27,6 +27,19 @@ function sample() {
     mealPlan: {},
     mealLog: {},
     ergoChecklist: { 'desk-height': true },
+    postureCamLog: {
+      '2026-06-15': {
+        monitoredMs: 3600000, goodMs: 3000000, poorMs: 500000, awayMs: 100000,
+        slouchEvents: 4, worstStreakMs: 60000, scoreSum: 8200, scoreCount: 100,
+        sessions: 2, awayCount: 1, lastSessionEndedAt: '2026-06-15T16:00:00.000Z',
+      },
+    },
+    sleepLog: { '2026-06-15': { hours: 7, quality: 4, position: 'side', wokeStiff: false, t: '2026-06-15T07:10:00.000Z' } },
+    flareLog: [{ id: 'f1', startedAt: '2026-06-01T09:00:00.000Z', startDay: '2026-06-01', endedAt: '2026-06-04T09:00:00.000Z', endDay: '2026-06-04', severity: 6, trigger: 'lifting', notes: '' }],
+    medLog: { '2026-06-15': [{ t: '2026-06-15T08:00:00.000Z', name: 'Ibuprofen', dose: '400mg' }] },
+    weightLog: { '2026-06-15': { kg: 78.4, t: '2026-06-15T07:00:00.000Z' } },
+    breathLog: { '2026-06-15': [{ t: '2026-06-15T12:00:00.000Z', durationSec: 120, kind: 'box' }] },
+    activityLog: { '2026-06-15': { sittingMin: 320, breaks: 5 } },
   };
 }
 

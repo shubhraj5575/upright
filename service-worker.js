@@ -8,7 +8,7 @@
 //
 // Bump CACHE_VERSION whenever shipping changed assets to retire old caches.
 
-const CACHE_VERSION = 'upright-v2-p1';
+const CACHE_VERSION = 'upright-v2-p2';
 
 const SHELL = [
   './',

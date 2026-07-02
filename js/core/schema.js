@@ -16,6 +16,13 @@ export const KEYS = [
   'mealPlan',
   'mealLog',
   'ergoChecklist',
+  'postureCamLog',
+  'sleepLog',
+  'flareLog',
+  'medLog',
+  'weightLog',
+  'breathLog',
+  'activityLog',
 ];
 
 /**
@@ -36,6 +43,13 @@ export const KIND = {
   mealPlan: 'object',
   mealLog: 'map',
   ergoChecklist: 'object',
+  postureCamLog: 'map',
+  sleepLog: 'map',
+  flareLog: 'array',
+  medLog: 'map',
+  weightLog: 'map',
+  breathLog: 'map',
+  activityLog: 'map',
 };
 
 /** Default settings — referenced by modules so config has stable shape. */
@@ -55,12 +69,31 @@ export function defaultSettings() {
       steps: 6000,
     },
     postureCamera: {
-      baseline: null, // calibrated "sit tall" keypoint snapshot (Phase 5)
+      baseline: null, // LEGACY pre-v2 calibration — kept so old backups import cleanly
       sensitivity: 0.5, // 0..1
       enabled: false,
+      activeProfile: 'sitting', // 'sitting' | 'standing'
+      profiles: {
+        sitting: { baseline: null, calibratedAt: null },
+        standing: { baseline: null, calibratedAt: null },
+      },
+      overlay: true, // draw the skeleton overlay on the live video
+      alerts: { sound: false }, // chime on the notification rung of the ladder
+      dismissedMobileAdvice: false,
+    },
+    flare: {
+      goalReductionPct: 50, // how much daily goals shrink during a flare-up
+    },
+    meds: {
+      reminderTimes: [], // ['08:00', ...] — fired by the reminder tick
+    },
+    wellbeing: {
+      weightEnabled: false, // weight tracking is opt-in
+      weightUnit: 'kg', // 'kg' | 'lb' (display only; storage is canonical kg)
     },
     physioConstraints: '', // free text — the user's real physio instructions
     disclaimerAckAt: null, // ISO timestamp when the disclaimer was acknowledged
+    onboardedAt: null, // ISO timestamp when first-run onboarding finished/skipped
   };
 }
 
@@ -74,6 +107,7 @@ export function defaults(createdAt = null) {
       schemaVersion: SCHEMA_VERSION,
       createdAt, // ISO timestamp, set at first-run seeding
       lastBackupAt: null, // ISO timestamp of last export
+      lastReviewWeekSeen: null, // week key of the last weekly review opened
     },
     settings: defaultSettings(),
     painLog: {}, // dayKey -> { pain:0..10, stiffness:0..10, mood?, notes? }
@@ -84,6 +118,23 @@ export function defaults(createdAt = null) {
     mealPlan: {}, // weekly grid — seeded from /data in Phase 3
     mealLog: {}, // dayKey -> [{ name, tags:[], t: ISO }]
     ergoChecklist: {}, // habitId -> true (today's ticked ergonomic habits)
+    // Camera-session day aggregates. Sums-and-counts so partial flushes merge
+    // without weighting bugs: avg score = scoreSum / scoreCount.
+    // dayKey -> { monitoredMs, goodMs, poorMs, awayMs, slouchEvents,
+    //             worstStreakMs, scoreSum, scoreCount, sessions, awayCount,
+    //             lastSessionEndedAt }
+    postureCamLog: {},
+    // Keyed to the WAKING day (last night's sleep lives under today).
+    // dayKey -> { hours, quality:1..5, position:'back'|'side'|'stomach'|'mixed'|null, wokeStiff:bool, t: ISO }
+    sleepLog: {},
+    // Flare-up episodes; at most one entry has endedAt === null (active).
+    // [{ id, startedAt: ISO, startDay, endedAt: ISO|null, endDay: string|null,
+    //    severity: 0..10, trigger: string, notes: string }]
+    flareLog: [],
+    medLog: {}, // dayKey -> [{ t: ISO, name, dose }]
+    weightLog: {}, // dayKey -> { kg, t: ISO }
+    breathLog: {}, // dayKey -> [{ t: ISO, durationSec, kind: 'box' }]
+    activityLog: {}, // dayKey -> { sittingMin, breaks }
   };
 }
 
@@ -95,7 +146,9 @@ export function defaults(createdAt = null) {
 export function mergeSettings(stored) {
   const d = defaultSettings();
   const s = stored && typeof stored === 'object' ? stored : {};
-  return {
+  const cam = s.postureCamera || {};
+  const camProfiles = cam.profiles || {};
+  const merged = {
     ...d,
     ...s,
     reminders: {
@@ -104,8 +157,27 @@ export function mergeSettings(stored) {
       activeHours: { ...d.reminders.activeHours, ...((s.reminders || {}).activeHours || {}) },
     },
     goals: { ...d.goals, ...(s.goals || {}) },
-    postureCamera: { ...d.postureCamera, ...(s.postureCamera || {}) },
+    postureCamera: {
+      ...d.postureCamera,
+      ...cam,
+      profiles: {
+        sitting: { ...d.postureCamera.profiles.sitting, ...(camProfiles.sitting || {}) },
+        standing: { ...d.postureCamera.profiles.standing, ...(camProfiles.standing || {}) },
+      },
+      alerts: { ...d.postureCamera.alerts, ...(cam.alerts || {}) },
+    },
+    flare: { ...d.flare, ...(s.flare || {}) },
+    meds: { ...d.meds, ...(s.meds || {}) },
+    wellbeing: { ...d.wellbeing, ...(s.wellbeing || {}) },
   };
+  // One-time backfill: a pre-v2 calibration lived at postureCamera.baseline.
+  // Copy it into the sitting profile; the legacy field itself is kept so old
+  // backups keep importing cleanly and downgrades lose nothing.
+  const mc = merged.postureCamera;
+  if (mc.baseline && !mc.profiles.sitting.baseline) {
+    mc.profiles.sitting.baseline = mc.baseline;
+  }
+  return merged;
 }
 
 /** Default value for a single key (used by store.get fallbacks). */

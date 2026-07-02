@@ -28,9 +28,10 @@
     import datesSuite from './dates.test.js';
     import backupSuite from './backup.test.js';
     import postureSuite from './posture-heuristic.test.js';
+    import schemaSuite from './schema.test.js';
 
     const out = document.getElementById('out');
-    const suites = [datesSuite, backupSuite, postureSuite];
+    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite];
     let total = 0, failed = 0;
 
     for (const s of suites) {
