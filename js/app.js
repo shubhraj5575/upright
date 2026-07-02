@@ -3,7 +3,8 @@
 
 import * as store from './core/store.js';
 import { mergeSettings } from './core/schema.js';
-import { el, mount, card, qs } from './core/ui.js';
+import { el, mount, card, qs, qsa, openDialog } from './core/ui.js';
+import { icon } from './core/icons.js';
 import { applyTheme } from './core/theme.js';
 import * as router from './router.js';
 import * as dashboard from './modules/dashboard.js';
@@ -49,6 +50,8 @@ function boot() {
     ));
   });
 
+  setupTabBar();
+
   router.start(qs('#app'), qs('.main-nav'));
 
   // Global reminder loop (independent of the active view).
@@ -60,6 +63,39 @@ function boot() {
       navigator.serviceWorker.register('service-worker.js').catch(() => {});
     });
   }
+}
+
+// Everything reachable from the mobile "More" sheet (not on the tab bar).
+const MORE_ROUTES = [
+  { path: 'goals', label: 'Walk & water', icon: 'droplet' },
+  { path: 'meals', label: 'Food', icon: 'utensils' },
+  { path: 'meal-plan', label: 'Meal plan', icon: 'calendar' },
+  { path: 'ergo', label: 'Ergonomics & sleep', icon: 'bed' },
+  { path: 'report', label: 'Physio report', icon: 'file-text' },
+  { path: 'settings', label: 'Settings', icon: 'sliders' },
+];
+
+function setupTabBar() {
+  // Inject stroke icons (declared as data-icon so the markup stays readable).
+  for (const item of qsa('.tab-bar [data-icon]')) {
+    const holder = item.querySelector('.tab-bar__icon');
+    if (holder) holder.appendChild(icon(item.dataset.icon, { size: 22 }));
+  }
+  const moreBtn = qs('#tab-more');
+  if (!moreBtn) return;
+  // Light the More tab whenever the active route lives inside the sheet.
+  moreBtn.dataset.nav = MORE_ROUTES.map((r) => r.path).join(',');
+  moreBtn.addEventListener('click', () => {
+    const current = router.currentPath();
+    const grid = el('nav', { class: 'more-grid', 'aria-label': 'More destinations' },
+      ...MORE_ROUTES.map((r) => el('a', {
+        href: '#/' + r.path,
+        class: r.path === current ? 'is-active' : null,
+        onClick: () => handle.close(),
+      }, icon(r.icon, { size: 20 }), r.label))
+    );
+    const handle = openDialog({ title: 'More', content: grid });
+  });
 }
 
 boot();

@@ -1,7 +1,8 @@
-/* tokens.css — design tokens. The single place colors, spacing, type and
-   elevation are defined. Everything else references var(--…) so the whole app
-   re-themes from here. Light is default; dark follows the OS via
-   prefers-color-scheme, and can be forced with <html data-theme="dark|light">. */
+/* tokens.css — design tokens ("Steady" design language). The single place
+   colors, spacing, type, elevation and motion are defined. Everything else
+   references var(--…) so the whole app re-themes from here. Light is default;
+   dark follows the OS via prefers-color-scheme, and can be forced with
+   <html data-theme="dark|light">. */
 
 :root {
   /* --- palette: calm, warm, recovery-minded ----------------------------- */
@@ -18,10 +19,13 @@
   --amber-300: #f1c27a;
   --amber-400: #e6a957;
   --amber-500: #d8913a;
+  --amber-700: #7c4f12;
   /* Signal colors. */
   --red-400: #e07a6b;
   --red-500: #cf5c4c;
+  --red-700: #9e3a29;
   --blue-400: #5b9bd1; /* water */
+  --blue-700: #2b5d8a;
   --violet-400: #8a86d6;
 
   /* Neutrals: warm sand greys so the UI feels soft, not sterile. */
@@ -58,8 +62,22 @@
   --color-accent: var(--amber-500);
   --color-accent-soft: #fbf1df;
 
+  /* Semantic state colors. Every -soft background has a guaranteed-contrast
+     -text partner (≥ 4.5:1 on that soft background, both themes) — use the
+     -text variant for words, the plain variant for dots/strokes/fills. */
+  --color-success: var(--green-500);
+  --color-success-soft: var(--green-50);
+  --color-success-text: var(--green-700);
+  --color-warn: var(--amber-500);
+  --color-warn-soft: #fbf1df;
+  --color-warn-text: var(--amber-700);
+  --color-info: var(--blue-400);
+  --color-info-soft: #e9f2f9;
+  --color-info-text: var(--blue-700);
   --color-danger: var(--red-500);
   --color-danger-soft: #fbece9;
+  --color-danger-text: var(--red-700);
+
   --color-water: var(--blue-400);
 
   --color-focus: var(--green-400);
@@ -83,6 +101,10 @@
 
   /* --- typography ------------------------------------------------------- */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Display face for big friendly numbers/headings. ui-rounded resolves on
+     Apple platforms; everywhere else it falls back to the sans stack — zero
+     webfont assets, consistent warmth where available. */
+  --font-display: ui-rounded, "SF Pro Rounded", var(--font-sans);
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --text-xs: 0.75rem;
@@ -92,43 +114,61 @@
   --text-xl: 1.375rem;
   --text-2xl: 1.75rem;
   --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
 
   --leading-tight: 1.2;
   --leading-normal: 1.55;
+
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
 
   --weight-normal: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  /* --- elevation -------------------------------------------------------- */
+  /* --- elevation (layered: tight contact shadow + soft ambient) ---------- */
+  --shadow-xs: 0 1px 1px rgba(28, 26, 21, 0.05);
   --shadow-sm: 0 1px 2px rgba(28, 26, 21, 0.06), 0 1px 1px rgba(28, 26, 21, 0.04);
   --shadow-md: 0 2px 8px rgba(28, 26, 21, 0.08), 0 1px 3px rgba(28, 26, 21, 0.05);
   --shadow-lg: 0 8px 28px rgba(28, 26, 21, 0.12), 0 2px 8px rgba(28, 26, 21, 0.06);
 
-  /* --- motion ----------------------------------------------------------- */
-  --transition-fast: 120ms ease;
-  --transition-base: 200ms ease;
+  /* --- motion ------------------------------------------------------------ */
+  /* All motion dies under prefers-reduced-motion (see base.css). */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-draw: 700ms; /* chart line draw-in */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: var(--duration-fast) var(--ease-out);
+  --transition-base: var(--duration-base) var(--ease-out);
 
   /* --- layout ----------------------------------------------------------- */
   --layout-max: 1100px;
   --header-h: 60px;
+  --tabbar-h: 60px;
   --z-header: 100;
+  --z-tabbar: 90;
+  --z-dialog: 500;
   --z-toast: 1000;
 }
 
+/* --- dark theme ----------------------------------------------------------
+   Refined: warm near-black bg, clearly stepped surfaces, muted text ≥4.5:1. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-bg: var(--sand-900);
-    --color-bg-elevated: var(--sand-800);
-    --color-surface: #232017;
-    --color-surface-2: #2c281f;
-    --color-border: #38332a;
-    --color-border-strong: #4a4438;
+    --color-bg: #16140f;
+    --color-bg-elevated: #262218;
+    --color-surface: #201d15;
+    --color-surface-2: #2b271c;
+    --color-border: #3a3528;
+    --color-border-strong: #4c4534;
 
     --color-text: #f1ece2;
-    --color-text-muted: #b8b0a0;
-    --color-text-faint: #8c8473;
+    --color-text-muted: #beb5a2;
+    --color-text-faint: #948b78;
     --color-text-on-accent: #11150f;
 
     --color-primary: var(--green-300);
@@ -139,12 +179,24 @@
     --color-accent: var(--amber-300);
     --color-accent-soft: #33291a;
 
+    --color-success: var(--green-300);
+    --color-success-soft: #1a2a26;
+    --color-success-text: #a9d3c9;
+    --color-warn: var(--amber-300);
+    --color-warn-soft: #33291a;
+    --color-warn-text: #f1c27a;
+    --color-info: #6fa9d6;
+    --color-info-soft: #1c2836;
+    --color-info-text: #a7cbe8;
     --color-danger: var(--red-400);
     --color-danger-soft: #3a221f;
+    --color-danger-text: #f0a99d;
+
     --color-water: #6fa9d6;
 
     --color-focus: var(--green-300);
 
+    --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.35);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.55);
@@ -153,15 +205,15 @@
 
 /* Forced dark via attribute (mirrors the media query block above). */
 :root[data-theme="dark"] {
-  --color-bg: var(--sand-900);
-  --color-bg-elevated: var(--sand-800);
-  --color-surface: #232017;
-  --color-surface-2: #2c281f;
-  --color-border: #38332a;
-  --color-border-strong: #4a4438;
+  --color-bg: #16140f;
+  --color-bg-elevated: #262218;
+  --color-surface: #201d15;
+  --color-surface-2: #2b271c;
+  --color-border: #3a3528;
+  --color-border-strong: #4c4534;
   --color-text: #f1ece2;
-  --color-text-muted: #b8b0a0;
-  --color-text-faint: #8c8473;
+  --color-text-muted: #beb5a2;
+  --color-text-faint: #948b78;
   --color-text-on-accent: #11150f;
   --color-primary: var(--green-300);
   --color-primary-hover: var(--green-200);
@@ -169,8 +221,22 @@
   --color-primary-border: #2c4a43;
   --color-accent: var(--amber-300);
   --color-accent-soft: #33291a;
+  --color-success: var(--green-300);
+  --color-success-soft: #1a2a26;
+  --color-success-text: #a9d3c9;
+  --color-warn: var(--amber-300);
+  --color-warn-soft: #33291a;
+  --color-warn-text: #f1c27a;
+  --color-info: #6fa9d6;
+  --color-info-soft: #1c2836;
+  --color-info-text: #a7cbe8;
   --color-danger: var(--red-400);
   --color-danger-soft: #3a221f;
+  --color-danger-text: #f0a99d;
   --color-water: #6fa9d6;
   --color-focus: var(--green-300);
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.55);
 }

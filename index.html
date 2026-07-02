@@ -6,7 +6,8 @@
   <title>Upright</title>
   <meta name="description" content="A private, local-first companion for back recovery and posture." />
   <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#2f8273" />
+  <meta name="theme-color" content="#2f8273" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#16140f" media="(prefers-color-scheme: dark)" />
 
   <!-- PWA: installable + offline-capable -->
   <link rel="manifest" href="manifest.webmanifest" />
@@ -29,16 +30,14 @@
         <span>Upright</span>
       </a>
       <nav class="main-nav" aria-label="Primary">
-        <a href="#/dashboard">Dashboard</a>
-        <a href="#/pain">Pain</a>
-        <a href="#/goals">Goals</a>
-        <a href="#/posture">Posture</a>
-        <a href="#/exercises">Exercises</a>
-        <a href="#/meal-plan">Meal plan</a>
-        <a href="#/meals">Meals</a>
-        <a href="#/ergo">Ergonomics</a>
-        <a href="#/report">Report</a>
-        <a href="#/settings">Settings</a>
+        <a href="#/dashboard" data-nav="dashboard">Dashboard</a>
+        <a href="#/pain" data-nav="pain">Pain</a>
+        <a href="#/goals" data-nav="goals">Goals</a>
+        <a href="#/posture" data-nav="posture">Posture</a>
+        <a href="#/exercises" data-nav="exercises">Exercises</a>
+        <a href="#/meals" data-nav="meals">Food</a>
+        <a href="#/report" data-nav="report">Report</a>
+        <a href="#/settings" data-nav="settings">Settings</a>
       </nav>
     </div>
   </header>
@@ -50,6 +49,15 @@
     Upright is a wellness tool, not medical advice. It complements your physiotherapist's plan —
     it does not replace it. <a href="#/settings">Disclaimer &amp; safety →</a>
   </footer>
+
+  <!-- Mobile bottom tab bar (hidden ≥720px). Icons injected by app.js. -->
+  <nav class="tab-bar" aria-label="Primary, compact">
+    <a href="#/dashboard" data-nav="dashboard" data-icon="home"><span class="tab-bar__icon"></span><span class="tab-bar__label">Home</span></a>
+    <a href="#/pain" data-nav="pain" data-icon="activity"><span class="tab-bar__icon"></span><span class="tab-bar__label">Pain</span></a>
+    <a href="#/posture" data-nav="posture" data-icon="posture-5"><span class="tab-bar__icon"></span><span class="tab-bar__label">Posture</span></a>
+    <a href="#/exercises" data-nav="exercises" data-icon="dumbbell"><span class="tab-bar__icon"></span><span class="tab-bar__label">Exercises</span></a>
+    <button type="button" id="tab-more" data-icon="more-horizontal"><span class="tab-bar__icon"></span><span class="tab-bar__label">More</span></button>
+  </nav>
 
   <!-- aria-live region for toast notifications (also the reminder fallback). -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>

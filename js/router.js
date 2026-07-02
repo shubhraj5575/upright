@@ -39,21 +39,28 @@ export function navigate(path) {
   location.hash = '#/' + path;
 }
 
+/**
+ * Active-state for every nav surface at once: any element with [data-nav]
+ * (top nav links, tab-bar items, More sheet entries) lights up when its
+ * path — or one of its comma-separated paths — matches.
+ */
 function updateNav(path) {
-  if (!navEl) return;
-  for (const link of navEl.querySelectorAll('a[href^="#/"]')) {
-    const linkPath = link.getAttribute('href').replace(/^#\/?/, '').split('?')[0];
-    const active = linkPath === path;
+  for (const link of document.querySelectorAll('[data-nav]')) {
+    const paths = (link.dataset.nav || '').split(',').map((p) => p.trim());
+    const active = paths.includes(path);
     link.classList.toggle('is-active', active);
-    if (active) link.setAttribute('aria-current', 'page');
+    if (active && link.tagName === 'A') link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
 }
 
-function render() {
-  const path = currentPath();
-  const route = routes.get(path);
+function reducedMotion() {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
+let firstRender = true;
+
+function renderInto(path, route) {
   // Tear down the previous view (unsubscribe store listeners, clear timers)
   // before swapping, so repeated navigation can't leak subscriptions.
   if (typeof currentCleanup === 'function') {
@@ -63,6 +70,7 @@ function render() {
 
   clear(mountEl);
   mountEl.scrollTop = 0;
+  window.scrollTo(0, 0);
 
   if (route) {
     document.title = `${route.title} · Upright`;
@@ -80,9 +88,35 @@ function render() {
   } else {
     mountEl.textContent = `No view registered for "${path}".`;
   }
+}
 
-  updateNav(path);
-  emit('route:change', { path });
+function render() {
+  const path = currentPath();
+  const route = routes.get(path);
+  const finish = () => {
+    updateNav(path);
+    if (!firstRender) {
+      // Move focus to the new view for keyboard/SR users (skip initial load —
+      // stealing focus at boot is hostile).
+      mountEl.focus({ preventScroll: true });
+    }
+    firstRender = false;
+    emit('route:change', { path });
+  };
+
+  // Cross-fade route swaps via the View Transitions API where available;
+  // otherwise a light CSS entrance on the mount element.
+  if (!firstRender && !reducedMotion() && typeof document.startViewTransition === 'function') {
+    document.startViewTransition(() => renderInto(path, route)).finished.finally(finish);
+  } else {
+    renderInto(path, route);
+    if (!firstRender && !reducedMotion()) {
+      mountEl.classList.remove('view-enter');
+      void mountEl.offsetWidth; // restart the animation
+      mountEl.classList.add('view-enter');
+    }
+    finish();
+  }
 }
 
 /** Begin routing. Call once after routes are registered. */
