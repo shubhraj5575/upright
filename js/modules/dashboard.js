@@ -16,6 +16,9 @@ import * as posture from './posture-reminders.js';
 import * as postureCamera from './posture-camera.js';
 import * as exercises from './exercises.js';
 import * as mealLog from './meal-log.js';
+import { activeFlare, activeFlareDays, flareDayKeys } from '../core/flare.js';
+import { buildInsights } from '../core/insights.js';
+import { isReviewReady } from '../core/review.js';
 
 function hasAnyHistory() {
   const nonEmpty = (k) => {
@@ -134,7 +137,10 @@ export function init(mountEl) {
         ),
         el('div', { class: 'quicklog__sep', 'aria-hidden': 'true' }),
         el('a', { class: 'btn btn--ghost', href: '#/pain' }, icon('edit', { size: 16 }), 'Log pain'),
-        el('a', { class: 'btn btn--ghost', href: '#/posture' }, icon('video', { size: 16 }), 'Camera check')
+        el('a', { class: 'btn btn--ghost', href: '#/posture' }, icon('video', { size: 16 }), 'Camera check'),
+        !activeFlare(store.get('flareLog') || [])
+          ? el('a', { class: 'btn btn--ghost', href: '#/flare' }, icon('zap', { size: 16 }), 'Having a flare-up?')
+          : null
       )
     );
   }
@@ -148,11 +154,26 @@ export function init(mountEl) {
     const ex = safeSummary(exercises);
     const ml = safeSummary(mealLog);
     const grace = (store.get('settings') || {}).streakGrace ?? 1;
-    const streak = computeStreak(activeDayKeys(), todayKey(), { grace });
+    // Flare days count as active — a flare must never break the streak.
+    const flareLog = store.get('flareLog') || [];
+    const streakDays = new Set(activeDayKeys());
+    for (const k of flareDayKeys(flareLog, todayKey())) streakDays.add(k);
+    const streak = computeStreak([...streakDays], todayKey(), { grace });
 
     const chip = renderHeader(streak);
     if (lastStreak != null && streak > lastStreak && chip) celebrate(chip);
     lastStreak = streak;
+
+    // --- flare banner ------------------------------------------------------------
+    const flare = activeFlare(flareLog);
+    if (flare) {
+      const days = activeFlareDays(flareLog, todayKey());
+      mount(host, el('a', { class: 'flare-banner', href: '#/flare' },
+        icon('zap', { size: 18 }),
+        el('span', {}, el('strong', {}, `Flare mode — day ${days}. `),
+          'Goals are reduced and your streak is protected.'),
+        el('span', { class: 'flare-banner__cta' }, 'Open →')));
+    }
 
     if (!hasAnyHistory()) {
       mount(host, card('Welcome to Upright',
@@ -237,7 +258,46 @@ export function init(mountEl) {
         accent: cam.pctGood != null && cam.pctGood >= 75 ? 'var(--color-primary)' : null,
       }));
     }
+
+    // Sleep tile (last night) with a 7-night sparkline.
+    const sleepLog = store.get('sleepLog') || {};
+    const sleepToday = sleepLog[todayKey()];
+    const sleepSpark = seriesOf(7, (k) => (sleepLog[k] && typeof sleepLog[k].hours === 'number' ? sleepLog[k].hours : null));
+    tiles.appendChild(statTile({
+      iconName: 'moon', label: 'Sleep last night', href: '#/wellbeing',
+      value: sleepToday ? `${sleepToday.hours}h` : '—',
+      sub: sleepToday
+        ? (sleepToday.wokeStiff ? 'woke stiff' : ['', 'rough', 'poor', 'okay', 'good', 'great'][sleepToday.quality] || '')
+        : 'Not logged yet',
+      spark: sleepSpark, sparkColor: 'var(--violet-400)',
+    }));
     mount(host, tiles);
+
+    // --- weekly review prompt + insights card -------------------------------------
+    const data = {
+      painLog, sleepLog, postureSelfLog: postureLog, goalsLog: store.get('goalsLog'),
+      exerciseLog: exLog, postureCamLog: store.get('postureCamLog'),
+      activityLog: store.get('activityLog'), flareLog, settings: store.get('settings'),
+    };
+    const review = isReviewReady(data, todayKey(), (store.get('meta') || {}).lastReviewWeekSeen);
+    if (review.ready) {
+      mount(host, el('a', { class: 'review-prompt', href: '#/insights' },
+        icon('sparkles', { size: 18 }),
+        el('span', {}, el('strong', {}, 'Your weekly review is ready. '), 'One win, one focus — 30 seconds.'),
+        el('span', { class: 'flare-banner__cta' }, 'Read it →')));
+    }
+
+    const ins = buildInsights(data, todayKey(), 3);
+    if (ins.top.length) {
+      mount(host, card('What your data is saying',
+        ...ins.top.map((r) => el('p', { class: 'insight__text', style: { marginBottom: 'var(--space-2)' } }, '· ', r.text)),
+        el('a', { href: '#/insights', class: 'field__hint' }, 'All insights →')));
+    } else if (ins.locked.length) {
+      const hint = ins.locked[0];
+      mount(host, card('Insights are warming up',
+        el('p', { class: 'text-muted' }, hint.lockedText),
+        el('a', { href: '#/insights', class: 'field__hint' }, 'See what else unlocks →')));
+    }
   }
 
   render();

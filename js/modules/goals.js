@@ -6,13 +6,17 @@ import { todayKey, addDays, parseKey, computeStreak } from '../core/dates.js';
 import { el, mount, clear, card, toast, pageHeader, celebrate, setFieldError } from '../core/ui.js';
 import { icon } from '../core/icons.js';
 import { progressRing, barChart } from '../core/charts.js';
+import { activeFlare, adjustedGoals } from '../core/flare.js';
 
 const KEY = 'goalsLog';
 
 function goalsCfg() {
   const s = store.get('settings') || {};
   const g = s.goals || {};
-  return { waterMl: g.waterMl || 2000, waterStepMl: g.waterStepMl || 250, steps: g.steps || 6000 };
+  const base = { waterMl: g.waterMl || 2000, waterStepMl: g.waterStepMl || 250, steps: g.steps || 6000 };
+  // During a flare the movement target shrinks (hydration stays as-is).
+  const flare = activeFlare(store.get('flareLog') || []);
+  return adjustedGoals(base, !!flare, (s.flare || {}).goalReductionPct ?? 50);
 }
 
 function log() {
@@ -136,6 +140,11 @@ export function init(mountEl) {
     );
 
     const todayCard = card('Today',
+      cfg.reduced
+        ? el('div', { class: 'callout', style: { marginBottom: 'var(--space-4)' } },
+            el('p', {}, el('strong', {}, 'Flare mode: '), `your step goal is reduced by ${cfg.reductionPct}% (to ${cfg.steps.toLocaleString()}) until the flare ends. `,
+              el('a', { href: '#/flare' }, 'Manage →')))
+        : null,
       el('div', { class: 'ring-group' }, waterBlock, stepBlock),
       streakRow,
       (waterPct >= 100 || stepPct >= 100)
@@ -169,7 +178,8 @@ export function init(mountEl) {
   render();
   const unsub = store.subscribe(KEY, render);
   const unsub2 = store.subscribe('settings', render);
-  return () => { unsub(); unsub2(); };
+  const unsub3 = store.subscribe('flareLog', render);
+  return () => { unsub(); unsub2(); unsub3(); };
 }
 
 export function getSummary() {

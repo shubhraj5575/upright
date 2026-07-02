@@ -7,6 +7,7 @@ import { todayKey, addDays, parseKey } from '../core/dates.js';
 import { el, mount, card } from '../core/ui.js';
 import { lineChart } from '../core/charts.js';
 import { summarizeDay } from './cam-session.js';
+import { completedFlares, activeFlare, activeFlareDays } from '../core/flare.js';
 
 function lastKeys(days) {
   const keys = [];
@@ -111,6 +112,22 @@ function goalsSection() {
   );
 }
 
+function flareSection() {
+  const log = store.get('flareLog') || [];
+  const done = completedFlares(log).slice(-6); // recent episodes
+  const active = activeFlare(log);
+  if (!done.length && !active) return null;
+  const rows = done.map((f) => el('li', {},
+    `${parseKey(f.startDay).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} — ${f.durationDays} day${f.durationDays === 1 ? '' : 's'}, severity ${f.severity}/10 at onset${f.trigger ? `, trigger: ${f.trigger}` : ''}`));
+  return card('Flare-ups',
+    active
+      ? el('p', {}, el('strong', {}, `Currently in a flare (day ${activeFlareDays(log, todayKey())}), `),
+          `severity ${active.severity}/10 at onset${active.trigger ? `, likely trigger: ${active.trigger}` : ''}.`)
+      : null,
+    rows.length ? el('ul', { style: { marginTop: 'var(--space-2)' } }, ...rows)
+      : el('p', { class: 'text-muted' }, 'No completed flare-ups recorded.'));
+}
+
 function cameraSection() {
   const log = store.get('postureCamLog') || {};
   const keys = lastKeys(14);
@@ -180,6 +197,7 @@ export function init(mountEl) {
         ? el('p', { style: { whiteSpace: 'pre-wrap' } }, constraints)
         : el('p', { class: 'text-muted' }, 'No constraints recorded yet — add them in Settings so they appear here.')),
     painSection(),
+    flareSection(),
     exerciseSection(),
     goalsSection(),
     cameraSection(),

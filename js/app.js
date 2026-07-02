@@ -18,6 +18,9 @@ import * as mealPlan from './modules/meal-plan.js';
 import * as mealLog from './modules/meal-log.js';
 import * as report from './modules/report.js';
 import * as onboarding from './modules/onboarding.js';
+import * as wellbeing from './modules/wellbeing.js';
+import * as insights from './modules/insights.js';
+import * as flare from './modules/flare.js';
 
 function boot() {
   const seeded = store.ensureSeeded();
@@ -40,6 +43,9 @@ function boot() {
   router.register('meal-plan', mealPlan.init, 'Meal plan');
   router.register('meals', mealLog.init, 'Food');
   router.register('ergo', ergo.init, 'Ergonomics & sleep');
+  router.register('wellbeing', wellbeing.init, 'Wellbeing');
+  router.register('insights', insights.init, 'Insights');
+  router.register('flare', flare.init, 'Flare-up'); // no nav item — reached from the dashboard
   router.register('report', report.init, 'Physio report');
   router.register('settings', settings.init, 'Settings');
 
@@ -72,6 +78,8 @@ function boot() {
 // Everything reachable from the mobile "More" sheet (not on the tab bar).
 const MORE_ROUTES = [
   { path: 'goals', label: 'Walk & water', icon: 'droplet' },
+  { path: 'wellbeing', label: 'Wellbeing', icon: 'moon' },
+  { path: 'insights', label: 'Insights', icon: 'lightbulb' },
   { path: 'meals', label: 'Food', icon: 'utensils' },
   { path: 'meal-plan', label: 'Meal plan', icon: 'calendar' },
   { path: 'ergo', label: 'Ergonomics & sleep', icon: 'bed' },

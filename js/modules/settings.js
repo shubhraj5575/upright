@@ -10,6 +10,7 @@ import * as notify from '../core/notify.js';
 import { mergeSettings } from '../core/schema.js';
 import { el, mount, card, toast, slider, pageHeader, segmented, setFieldError, openDialog } from '../core/ui.js';
 import { icon } from '../core/icons.js';
+import { RED_FLAG_TITLE, RED_FLAG_BODY } from '../core/flare.js';
 import { applyTheme } from '../core/theme.js';
 import { resetReminderClock } from './posture-reminders.js';
 
@@ -58,9 +59,8 @@ function disclaimerCard() {
         'Upright supports — it does not replace — the plan your physiotherapist or doctor gave you. '
         + 'Always follow their specific instructions.')),
     el('div', { class: 'callout callout--warn', style: { marginTop: 'var(--space-3)' } },
-      el('div', { class: 'callout__title' }, '⚠ Seek prompt medical care if you notice'),
-      el('p', {}, 'new numbness in the groin/saddle area, leg weakness, or any loss of bladder or bowel control. '
-        + 'These can signal a serious problem and need urgent attention.')),
+      el('div', { class: 'callout__title' }, `⚠ ${RED_FLAG_TITLE}`),
+      el('p', {}, RED_FLAG_BODY)),
     el('div', { class: 'row', style: { marginTop: 'var(--space-4)' } }, ackBtn, status)
   );
 }
@@ -164,6 +164,17 @@ function cameraCard() {
     el('p', { class: 'field__hint', style: { marginTop: 'var(--space-3)' } },
       'Camera acting up? ', el('a', { href: '#/posture?diag=1' }, 'Test camera setup →'))
   );
+}
+
+function flareCard() {
+  const f = settings().flare || {};
+  const reduction = numberField('Goal reduction during a flare (%)', f.goalReductionPct ?? 50, 10, 90, 5,
+    (v) => patch((n) => { n.flare.goalReductionPct = v; }));
+  return card('Flare-ups',
+    el('p', { class: 'card__subtitle' }, 'When you switch on flare mode, your step goal shrinks by this much and your streak is protected until the flare ends.'),
+    el('div', { class: 'grid' }, reduction),
+    el('p', { class: 'field__hint', style: { marginTop: 'var(--space-3)' } },
+      el('a', { href: '#/flare' }, 'Open flare mode →')));
 }
 
 function streakCard() {
@@ -308,6 +319,7 @@ export function init(mountEl) {
     { id: 'reminders', label: 'Reminders', node: remindersCard() },
     { id: 'goals', label: 'Goals', node: goalsCard() },
     { id: 'camera', label: 'Camera', node: cameraCard() },
+    { id: 'flare', label: 'Flare', node: flareCard() },
     { id: 'streaks', label: 'Streaks', node: streakCard() },
     { id: 'physio', label: 'Physio', node: physioCard() },
     { id: 'data', label: 'Data', node: dataCard() },

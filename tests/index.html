@@ -33,9 +33,12 @@
     import camSessionSuite from './cam-session.test.js';
     import ladderSuite from './alert-ladder.test.js';
     import diagSuite from './cam-diagnostics.test.js';
+    import flareSuite from './flare.test.js';
+    import reviewSuite from './review.test.js';
+    import insightsSuite from './insights.test.js';
 
     const out = document.getElementById('out');
-    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite, scoreSuite, camSessionSuite, ladderSuite, diagSuite];
+    const suites = [datesSuite, backupSuite, postureSuite, schemaSuite, scoreSuite, camSessionSuite, ladderSuite, diagSuite, flareSuite, reviewSuite, insightsSuite];
     let total = 0, failed = 0;
 
     for (const s of suites) {
