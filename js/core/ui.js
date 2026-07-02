@@ -15,11 +15,12 @@ export function clear(node) {
   return node;
 }
 
-/** Append children (strings become text nodes; arrays are flattened). */
+/** Append children (strings/numbers become text nodes; arrays are flattened). */
 export function mount(node, ...children) {
   for (const child of children.flat()) {
     if (child == null || child === false) continue;
-    node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+    const isText = typeof child === 'string' || typeof child === 'number';
+    node.appendChild(isText ? document.createTextNode(String(child)) : child);
   }
   return node;
 }
