@@ -9,6 +9,26 @@ import { lineChart } from '../core/charts.js';
 import { summarizeDay } from './cam-session.js';
 import { completedFlares, activeFlare, activeFlareDays } from '../core/flare.js';
 import { regionCounts, topRegions } from '../core/body-regions.js';
+import { dailyTotals } from '../core/nutrition.js';
+
+// Display labels for the 13 canonical nutrient keys (mirrors meal-log.js's
+// NUTRIENT_META, kept local since report.js doesn't import that module).
+const NUTRIENT_LABELS = {
+  kcal: 'Calories', protein_g: 'Protein', carb_g: 'Carbs', fat_g: 'Fat',
+  fiber_g: 'Fiber', sugar_g: 'Sugar', sodium_mg: 'Sodium', calcium_mg: 'Calcium',
+  vitD_ug: 'Vitamin D', magnesium_mg: 'Magnesium', potassium_mg: 'Potassium',
+  iron_mg: 'Iron', omega3_g: 'Omega-3',
+};
+const DEFAULT_NUTRITION_TARGETS = {
+  kcal: 2000, protein_g: 60, carb_g: 250, fat_g: 70, fiber_g: 30,
+  sugar_g: 50, sodium_mg: 2300, calcium_mg: 1000, vitD_ug: 15,
+  magnesium_mg: 400, potassium_mg: 3500, iron_mg: 12, omega3_g: 1.6,
+};
+// "Reach" nutrients — ones where climbing toward the target is beneficial, so a
+// low % genuinely reads as a gap. Deliberately excludes kcal/carb_g/fat_g (shown
+// elsewhere) and the limit-nutrients sodium_mg/sugar_g (where being UNDER target
+// is good, not a deficiency), so the "typically low" line stays honest.
+const REACH_NUTRIENTS = ['protein_g', 'fiber_g', 'calcium_mg', 'vitD_ug', 'magnesium_mg', 'potassium_mg', 'iron_mg', 'omega3_g'];
 
 function lastKeys(days) {
   const keys = [];
@@ -153,6 +173,57 @@ function goalsSection() {
   );
 }
 
+function nutritionSection() {
+  const log = store.get('mealLog') || {};
+  const keys = lastKeys(28);
+  const settings = store.get('settings') || {};
+  const targets = { ...DEFAULT_NUTRITION_TARGETS, ...(((settings.nutrition || {}).targets) || {}) };
+
+  const loggedTotals = keys
+    .filter((k) => (log[k] || []).some((e) => e.nutrients))
+    .map((k) => dailyTotals(log[k] || []));
+
+  if (loggedTotals.length < 3) return null; // keep the report tight, like weightSection/medsSection
+
+  const kcals = loggedTotals.map((t) => t.kcal);
+  const proteins = loggedTotals.map((t) => t.protein_g);
+  const fibers = loggedTotals.map((t) => t.fiber_g);
+
+  const proteinMet = loggedTotals.filter((t) => t.protein_g >= targets.protein_g).length;
+  const fiberMet = loggedTotals.filter((t) => t.fiber_g >= targets.fiber_g).length;
+
+  // For each "reach" nutrient, mean(amount)/target as a % — then surface the
+  // 2-3 biggest gaps (lowest % of target) as honest context for a physio.
+  // Limit-nutrients (sodium/sugar) and kcal/macros are excluded so a healthily
+  // low intake never reads as a deficiency.
+  const pctOfTarget = REACH_NUTRIENTS
+    .filter((key) => targets[key] > 0)
+    .map((key) => {
+      const mean = avg(loggedTotals.map((t) => t[key] || 0)) || 0;
+      return { key, pct: (mean / targets[key]) * 100 };
+    })
+    .sort((a, b) => a.pct - b.pct);
+  const lowest = pctOfTarget.slice(0, 3);
+
+  const body = el('div', {},
+    el('div', { class: 'row', style: { gap: 'var(--space-6)', flexWrap: 'wrap' } },
+      stat('Avg daily calories', `${fmt(avg(kcals), 0)} kcal`),
+      stat('Avg daily protein', `${fmt(avg(proteins))} g`),
+      stat('Avg daily fiber', `${fmt(avg(fibers))} g`),
+      stat('Days logged', `${loggedTotals.length} / 28`)
+    ),
+    el('p', { style: { marginTop: 'var(--space-3)' } },
+      `Protein target met: ${proteinMet} of ${loggedTotals.length} logged days. `,
+      `Fiber target met: ${fiberMet} of ${loggedTotals.length} logged days.`),
+    lowest.length ? el('p', { style: { marginTop: 'var(--space-2)' } },
+      el('strong', {}, 'Typically low vs target: '),
+      lowest.map((r) => `${NUTRIENT_LABELS[r.key] || r.key} (${Math.round(r.pct)}%)`).join(', '), '.') : null,
+    el('p', { class: 'text-faint', style: { fontSize: 'var(--text-xs)', marginTop: 'var(--space-2)' } },
+      'Self-logged food; nutrient figures are estimates from a public food database, not a dietitian’s assessment.')
+  );
+  return card('Nutrition (last 4 weeks)', body);
+}
+
 function flareSection() {
   const log = store.get('flareLog') || [];
   const done = completedFlares(log).slice(-6); // recent episodes
@@ -241,6 +312,7 @@ export function init(mountEl) {
     flareSection(),
     exerciseSection(),
     goalsSection(),
+    nutritionSection(),
     cameraSection(),
     medsSection(),
     weightSection(),
