@@ -466,9 +466,13 @@ export function init(mountEl) {
   mount(mountEl, searchCard, dataHost);
 
   function entryRow(e) {
-    const portion = e.grams != null
-      ? (e.unit && e.unit !== 'g' ? `${e.qty} × ${e.unit}` : `${round(e.grams, 0)} g`)
-      : null;
+    // Portion label: a named serving keeps its label with the gram weight in
+    // parens ("1 medium (182 g)"); a grams-only serving (custom amount, or a
+    // "100 g" serving whose label already IS the grams) shows just the grams.
+    const gramsStr = e.grams != null ? `${round(e.grams, 0)} g` : null;
+    const portion = gramsStr == null ? null
+      : (!e.unit || e.unit === 'g' || e.unit === gramsStr) ? gramsStr
+      : `${e.unit} (${gramsStr})`;
     const kcalText = e.nutrients ? `${round(e.nutrients.kcal, 0)} kcal` : null;
     return el('div', { class: 'row row--between', style: { alignItems: 'flex-start', gap: 'var(--space-3)' } },
       el('div', { class: 'stack', style: { gap: 'var(--space-1)' } },
