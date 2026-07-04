@@ -43,6 +43,12 @@ test('v2 keys are present', () => {
   eq(KIND.postureCamLog, 'map');
 });
 
+test('foodCache key is present with map kind and empty default', () => {
+  ok(KEYS.includes('foodCache'), 'foodCache should be in KEYS');
+  eq(KIND.foodCache, 'map');
+  deepEq(defaultFor('foodCache'), {});
+});
+
 test('meta default gains lastReviewWeekSeen', () => {
   eq(defaults().meta.lastReviewWeekSeen, null);
 });
@@ -65,6 +71,21 @@ test('defaultSettings has flare/meds/wellbeing/onboardedAt', () => {
   eq(d.wellbeing.weightEnabled, false);
   eq(d.wellbeing.weightUnit, 'kg');
   eq(d.onboardedAt, null);
+});
+
+test('defaultSettings has nutrition block with 13 canonical target keys', () => {
+  const d = defaultSettings();
+  eq(d.nutrition.usdaApiKey, '');
+  eq(d.nutrition.onlineLookup, true);
+  eq(d.nutrition.targets.kcal, 2000);
+  const targetKeys = [
+    'kcal', 'protein_g', 'carb_g', 'fat_g', 'fiber_g',
+    'sugar_g', 'sodium_mg', 'calcium_mg', 'vitD_ug',
+    'magnesium_mg', 'potassium_mg', 'iron_mg', 'omega3_g',
+  ];
+  for (const key of targetKeys) {
+    ok(Object.prototype.hasOwnProperty.call(d.nutrition.targets, key), `targets missing ${key}`);
+  }
 });
 
 // --- mergeSettings ----------------------------------------------------------
@@ -117,6 +138,22 @@ test('mergeSettings never clobbers an existing profile baseline with legacy', ()
 test('mergeSettings is idempotent', () => {
   const once = mergeSettings({ theme: 'light', postureCamera: { baseline: { verticalGap: 1 } } });
   deepEq(mergeSettings(once), once);
+});
+
+test('mergeSettings({}) returns a full nutrition block equal to the default', () => {
+  deepEq(mergeSettings({}).nutrition, defaultSettings().nutrition);
+});
+
+test('mergeSettings keeps stored nutrition values and deep-merges targets', () => {
+  const m = mergeSettings({ nutrition: { usdaApiKey: 'MYKEY', targets: { kcal: 1800 } } });
+  eq(m.nutrition.usdaApiKey, 'MYKEY');
+  eq(m.nutrition.targets.kcal, 1800);
+  eq(m.nutrition.targets.protein_g, 60, 'newly-added target key backfilled');
+});
+
+test('mergeSettings is idempotent for the nutrition block', () => {
+  const once = mergeSettings({ nutrition: { usdaApiKey: 'MYKEY', targets: { kcal: 1800 } } });
+  deepEq(mergeSettings(once).nutrition, once.nutrition);
 });
 
 // --- validateDataset ---------------------------------------------------------

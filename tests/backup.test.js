@@ -26,6 +26,7 @@ function sample() {
     exerciseLog: { '2026-06-15': ['cat-cow'] },
     mealPlan: {},
     mealLog: {},
+    foodCache: {},
     ergoChecklist: { 'desk-height': true },
     postureCamLog: {
       '2026-06-15': {

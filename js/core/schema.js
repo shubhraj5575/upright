@@ -15,6 +15,7 @@ export const KEYS = [
   'exerciseLog',
   'mealPlan',
   'mealLog',
+  'foodCache',
   'ergoChecklist',
   'postureCamLog',
   'sleepLog',
@@ -42,6 +43,7 @@ export const KIND = {
   exerciseLog: 'map',
   mealPlan: 'object',
   mealLog: 'map',
+  foodCache: 'map',
   ergoChecklist: 'object',
   postureCamLog: 'map',
   sleepLog: 'map',
@@ -91,6 +93,15 @@ export function defaultSettings() {
       weightEnabled: false, // weight tracking is opt-in
       weightUnit: 'kg', // 'kg' | 'lb' (display only; storage is canonical kg)
     },
+    nutrition: {
+      usdaApiKey: '',        // user's free FoodData Central key; '' → trial DEMO_KEY
+      onlineLookup: true,    // allow USDA online search (search terms leave device)
+      targets: {             // daily nutrient targets — general guidance, editable, NOT medical advice
+        kcal: 2000, protein_g: 60, carb_g: 250, fat_g: 70, fiber_g: 30,
+        sugar_g: 50, sodium_mg: 2300, calcium_mg: 1000, vitD_ug: 15,
+        magnesium_mg: 400, potassium_mg: 3500, iron_mg: 12, omega3_g: 1.6,
+      },
+    },
     physioConstraints: '', // free text — the user's real physio instructions
     disclaimerAckAt: null, // ISO timestamp when the disclaimer was acknowledged
     onboardedAt: null, // ISO timestamp when first-run onboarding finished/skipped
@@ -117,6 +128,8 @@ export function defaults(createdAt = null) {
     exerciseLog: {}, // dayKey -> [exerciseId, ...]
     mealPlan: {}, // weekly grid — seeded from /data in Phase 3
     mealLog: {}, // dayKey -> [{ name, tags:[], t: ISO }]
+    // foodId -> { id, source, name, brand?, servings:[{label,grams}], per100g:{...nutrients}, fetchedAt }
+    foodCache: {},
     ergoChecklist: {}, // habitId -> true (today's ticked ergonomic habits)
     // Camera-session day aggregates. Sums-and-counts so partial flushes merge
     // without weighting bugs: avg score = scoreSum / scoreCount.
@@ -169,6 +182,11 @@ export function mergeSettings(stored) {
     flare: { ...d.flare, ...(s.flare || {}) },
     meds: { ...d.meds, ...(s.meds || {}) },
     wellbeing: { ...d.wellbeing, ...(s.wellbeing || {}) },
+    nutrition: {
+      ...d.nutrition,
+      ...(s.nutrition || {}),
+      targets: { ...d.nutrition.targets, ...((s.nutrition || {}).targets || {}) },
+    },
   };
   // One-time backfill: a pre-v2 calibration lived at postureCamera.baseline.
   // Copy it into the sitting profile; the legacy field itself is kept so old
