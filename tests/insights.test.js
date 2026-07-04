@@ -15,7 +15,7 @@ const day = (i) => addDays(TODAY, -i); // i days ago
 function emptyData() {
   return {
     painLog: {}, sleepLog: {}, postureSelfLog: {}, goalsLog: {}, exerciseLog: {},
-    postureCamLog: {}, activityLog: {}, flareLog: [],
+    postureCamLog: {}, activityLog: {}, flareLog: [], mealLog: {},
     settings: { goals: { waterMl: 2000, steps: 6000 } },
   };
 }
@@ -171,6 +171,39 @@ test('camera trend compares weeks only with 3+ monitored days each', () => {
   ok(r.unlocked, 'unlocked with 4 days each week');
   ok(r.text.includes('85%') && r.text.includes('60%'), r.text);
   eq(r.direction, 'higher');
+});
+
+const ZERO_NUTRIENTS = {
+  kcal: 0, protein_g: 0, carb_g: 0, fat_g: 0, fiber_g: 0, sugar_g: 0, sodium_mg: 0,
+  calcium_mg: 0, vitD_ug: 0, magnesium_mg: 0, potassium_mg: 0, iron_mg: 0, omega3_g: 0,
+};
+
+function proteinStiffData(nPerSide) {
+  const d = emptyData();
+  d.settings = { goals: { waterMl: 2000, steps: 6000 }, nutrition: { targets: { protein_g: 60, fiber_g: 30 } } };
+  for (let i = 1; i <= nPerSide; i++) {
+    d.mealLog[day(i)] = [{ name: 'x', t: 'x', meal: 'lunch', grams: 200, nutrients: { ...ZERO_NUTRIENTS, protein_g: 90 } }];
+    d.painLog[day(i)] = { pain: 4, stiffness: 3 };
+  }
+  for (let i = 7; i <= 6 + nPerSide; i++) {
+    d.mealLog[day(i)] = [{ name: 'x', t: 'x', meal: 'lunch', grams: 200, nutrients: { ...ZERO_NUTRIENTS, protein_g: 20 } }];
+    d.painLog[day(i)] = { pain: 4, stiffness: 6 };
+  }
+  return d;
+}
+
+test('protein→stiffness unlocks with 6v6 and cites sample sizes', () => {
+  const res = buildInsights(proteinStiffData(6), TODAY);
+  const r = res.all.find((x) => x.id === 'protein-stiffness');
+  ok(r.unlocked, 'unlocked with 6v6');
+  ok(/\d+ day/.test(r.text), `cites day counts: ${r.text}`);
+  eq(r.direction, 'lower', 'protein-met stiffness (3) < lower-protein stiffness (6)');
+});
+
+test('protein→stiffness stays locked with only 3 days per side', () => {
+  const res = buildInsights(proteinStiffData(3), TODAY);
+  const r = res.all.find((x) => x.id === 'protein-stiffness');
+  eq(r.unlocked, false, 'locked below MIN_N per side');
 });
 
 const isNode = typeof window === 'undefined';

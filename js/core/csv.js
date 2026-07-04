@@ -74,8 +74,25 @@ export const CSV_KINDS = [
   {
     id: 'mealLog', label: 'Food',
     flatten: (log) => [
-      ['day', 'time', 'name', 'tags'],
-      ...sortedDays(log).flatMap((day) => (log[day] || []).map((e) => [day, e.t, e.name, (e.tags || []).join('; ')])),
+      ['day', 'time', 'meal', 'name', 'grams', 'kcal', 'protein_g', 'carb_g', 'fat_g', 'fiber_g',
+        'sugar_g', 'sodium_mg', 'calcium_mg', 'vitD_ug', 'magnesium_mg', 'potassium_mg', 'iron_mg', 'omega3_g', 'tags'],
+      ...sortedDays(log).flatMap((day) => (log[day] || []).map((e) => [
+        day, e.t, e.meal || '', e.name, e.grams ?? '',
+        (e.nutrients && e.nutrients.kcal != null) ? e.nutrients.kcal : '',
+        (e.nutrients && e.nutrients.protein_g != null) ? e.nutrients.protein_g : '',
+        (e.nutrients && e.nutrients.carb_g != null) ? e.nutrients.carb_g : '',
+        (e.nutrients && e.nutrients.fat_g != null) ? e.nutrients.fat_g : '',
+        (e.nutrients && e.nutrients.fiber_g != null) ? e.nutrients.fiber_g : '',
+        (e.nutrients && e.nutrients.sugar_g != null) ? e.nutrients.sugar_g : '',
+        (e.nutrients && e.nutrients.sodium_mg != null) ? e.nutrients.sodium_mg : '',
+        (e.nutrients && e.nutrients.calcium_mg != null) ? e.nutrients.calcium_mg : '',
+        (e.nutrients && e.nutrients.vitD_ug != null) ? e.nutrients.vitD_ug : '',
+        (e.nutrients && e.nutrients.magnesium_mg != null) ? e.nutrients.magnesium_mg : '',
+        (e.nutrients && e.nutrients.potassium_mg != null) ? e.nutrients.potassium_mg : '',
+        (e.nutrients && e.nutrients.iron_mg != null) ? e.nutrients.iron_mg : '',
+        (e.nutrients && e.nutrients.omega3_g != null) ? e.nutrients.omega3_g : '',
+        (e.tags || []).join('; '),
+      ])),
     ],
   },
   {

@@ -282,6 +282,7 @@ export function init(mountEl) {
       painLog, sleepLog, postureSelfLog: postureLog, goalsLog: store.get('goalsLog'),
       exerciseLog: exLog, postureCamLog: store.get('postureCamLog'),
       activityLog: store.get('activityLog'), flareLog, settings: store.get('settings'),
+      mealLog: store.get('mealLog'),
     };
     const review = isReviewReady(data, todayKey(), (store.get('meta') || {}).lastReviewWeekSeen);
     if (review.ready) {
