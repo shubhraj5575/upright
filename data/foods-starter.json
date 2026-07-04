@@ -1,0 +1,1066 @@
+[
+  {
+    "id": "seed:apple-raw",
+    "source": "seed",
+    "name": "Apple, raw, with skin",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 182 }
+    ],
+    "per100g": {
+      "kcal": 52, "protein_g": 0.3, "carb_g": 13.8, "fat_g": 0.2, "fiber_g": 2.4,
+      "sugar_g": 10.4, "sodium_mg": 1, "calcium_mg": 6, "vitD_ug": 0,
+      "magnesium_mg": 5, "potassium_mg": 107, "iron_mg": 0.12, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:banana-raw",
+    "source": "seed",
+    "name": "Banana, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 118 }
+    ],
+    "per100g": {
+      "kcal": 89, "protein_g": 1.1, "carb_g": 22.8, "fat_g": 0.3, "fiber_g": 2.6,
+      "sugar_g": 12.2, "sodium_mg": 1, "calcium_mg": 5, "vitD_ug": 0,
+      "magnesium_mg": 27, "potassium_mg": 358, "iron_mg": 0.26, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:orange-raw",
+    "source": "seed",
+    "name": "Orange, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 131 }
+    ],
+    "per100g": {
+      "kcal": 47, "protein_g": 0.9, "carb_g": 11.8, "fat_g": 0.1, "fiber_g": 2.4,
+      "sugar_g": 9.4, "sodium_mg": 0, "calcium_mg": 40, "vitD_ug": 0,
+      "magnesium_mg": 10, "potassium_mg": 181, "iron_mg": 0.1, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:strawberries-raw",
+    "source": "seed",
+    "name": "Strawberries, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, halves", "grams": 152 }
+    ],
+    "per100g": {
+      "kcal": 32, "protein_g": 0.7, "carb_g": 7.7, "fat_g": 0.3, "fiber_g": 2.0,
+      "sugar_g": 4.9, "sodium_mg": 1, "calcium_mg": 16, "vitD_ug": 0,
+      "magnesium_mg": 13, "potassium_mg": 153, "iron_mg": 0.41, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:blueberries-raw",
+    "source": "seed",
+    "name": "Blueberries, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 148 }
+    ],
+    "per100g": {
+      "kcal": 57, "protein_g": 0.7, "carb_g": 14.5, "fat_g": 0.3, "fiber_g": 2.4,
+      "sugar_g": 10.0, "sodium_mg": 1, "calcium_mg": 6, "vitD_ug": 0,
+      "magnesium_mg": 6, "potassium_mg": 77, "iron_mg": 0.28, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:grapes-raw",
+    "source": "seed",
+    "name": "Grapes, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 151 }
+    ],
+    "per100g": {
+      "kcal": 69, "protein_g": 0.7, "carb_g": 18.1, "fat_g": 0.2, "fiber_g": 0.9,
+      "sugar_g": 15.5, "sodium_mg": 2, "calcium_mg": 10, "vitD_ug": 0,
+      "magnesium_mg": 7, "potassium_mg": 191, "iron_mg": 0.36, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:avocado-raw",
+    "source": "seed",
+    "name": "Avocado, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1/2 medium", "grams": 68 }
+    ],
+    "per100g": {
+      "kcal": 160, "protein_g": 2.0, "carb_g": 8.5, "fat_g": 14.7, "fiber_g": 6.7,
+      "sugar_g": 0.7, "sodium_mg": 7, "calcium_mg": 12, "vitD_ug": 0,
+      "magnesium_mg": 29, "potassium_mg": 485, "iron_mg": 0.55, "omega3_g": 0.11
+    }
+  },
+  {
+    "id": "seed:kiwi-raw",
+    "source": "seed",
+    "name": "Kiwifruit, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 76 }
+    ],
+    "per100g": {
+      "kcal": 61, "protein_g": 1.1, "carb_g": 14.7, "fat_g": 0.5, "fiber_g": 3.0,
+      "sugar_g": 9.0, "sodium_mg": 3, "calcium_mg": 34, "vitD_ug": 0,
+      "magnesium_mg": 17, "potassium_mg": 312, "iron_mg": 0.31, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:mango-raw",
+    "source": "seed",
+    "name": "Mango, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, pieces", "grams": 165 }
+    ],
+    "per100g": {
+      "kcal": 60, "protein_g": 0.8, "carb_g": 15.0, "fat_g": 0.4, "fiber_g": 1.6,
+      "sugar_g": 13.7, "sodium_mg": 1, "calcium_mg": 11, "vitD_ug": 0,
+      "magnesium_mg": 10, "potassium_mg": 168, "iron_mg": 0.16, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:spinach-raw",
+    "source": "seed",
+    "name": "Spinach, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 30 }
+    ],
+    "per100g": {
+      "kcal": 23, "protein_g": 2.9, "carb_g": 3.6, "fat_g": 0.4, "fiber_g": 2.2,
+      "sugar_g": 0.4, "sodium_mg": 79, "calcium_mg": 99, "vitD_ug": 0,
+      "magnesium_mg": 79, "potassium_mg": 558, "iron_mg": 2.71, "omega3_g": 0.14
+    }
+  },
+  {
+    "id": "seed:kale-raw",
+    "source": "seed",
+    "name": "Kale, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, chopped", "grams": 67 }
+    ],
+    "per100g": {
+      "kcal": 49, "protein_g": 4.3, "carb_g": 8.8, "fat_g": 0.9, "fiber_g": 3.6,
+      "sugar_g": 2.3, "sodium_mg": 38, "calcium_mg": 150, "vitD_ug": 0,
+      "magnesium_mg": 33, "potassium_mg": 348, "iron_mg": 1.47, "omega3_g": 0.13
+    }
+  },
+  {
+    "id": "seed:broccoli-raw",
+    "source": "seed",
+    "name": "Broccoli, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, chopped", "grams": 91 }
+    ],
+    "per100g": {
+      "kcal": 34, "protein_g": 2.8, "carb_g": 6.6, "fat_g": 0.4, "fiber_g": 2.6,
+      "sugar_g": 1.7, "sodium_mg": 33, "calcium_mg": 47, "vitD_ug": 0,
+      "magnesium_mg": 21, "potassium_mg": 316, "iron_mg": 0.73, "omega3_g": 0.02
+    }
+  },
+  {
+    "id": "seed:carrot-raw",
+    "source": "seed",
+    "name": "Carrot, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 61 }
+    ],
+    "per100g": {
+      "kcal": 41, "protein_g": 0.9, "carb_g": 9.6, "fat_g": 0.2, "fiber_g": 2.8,
+      "sugar_g": 4.7, "sodium_mg": 69, "calcium_mg": 33, "vitD_ug": 0,
+      "magnesium_mg": 12, "potassium_mg": 320, "iron_mg": 0.3, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:tomato-raw",
+    "source": "seed",
+    "name": "Tomato, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 123 }
+    ],
+    "per100g": {
+      "kcal": 18, "protein_g": 0.9, "carb_g": 3.9, "fat_g": 0.2, "fiber_g": 1.2,
+      "sugar_g": 2.6, "sodium_mg": 5, "calcium_mg": 10, "vitD_ug": 0,
+      "magnesium_mg": 11, "potassium_mg": 237, "iron_mg": 0.27, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:cucumber-raw",
+    "source": "seed",
+    "name": "Cucumber, raw, with peel",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, sliced", "grams": 119 }
+    ],
+    "per100g": {
+      "kcal": 15, "protein_g": 0.7, "carb_g": 3.6, "fat_g": 0.1, "fiber_g": 0.5,
+      "sugar_g": 1.7, "sodium_mg": 2, "calcium_mg": 16, "vitD_ug": 0,
+      "magnesium_mg": 13, "potassium_mg": 147, "iron_mg": 0.28, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:bell-pepper-red-raw",
+    "source": "seed",
+    "name": "Bell pepper, red, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 119 }
+    ],
+    "per100g": {
+      "kcal": 31, "protein_g": 1.0, "carb_g": 6.0, "fat_g": 0.3, "fiber_g": 2.1,
+      "sugar_g": 4.2, "sodium_mg": 4, "calcium_mg": 7, "vitD_ug": 0,
+      "magnesium_mg": 12, "potassium_mg": 211, "iron_mg": 0.43, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:onion-raw",
+    "source": "seed",
+    "name": "Onion, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 110 }
+    ],
+    "per100g": {
+      "kcal": 40, "protein_g": 1.1, "carb_g": 9.3, "fat_g": 0.1, "fiber_g": 1.7,
+      "sugar_g": 4.2, "sodium_mg": 4, "calcium_mg": 23, "vitD_ug": 0,
+      "magnesium_mg": 10, "potassium_mg": 146, "iron_mg": 0.21, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:garlic-raw",
+    "source": "seed",
+    "name": "Garlic, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 clove", "grams": 3 }
+    ],
+    "per100g": {
+      "kcal": 149, "protein_g": 6.4, "carb_g": 33.1, "fat_g": 0.5, "fiber_g": 2.1,
+      "sugar_g": 1.0, "sodium_mg": 17, "calcium_mg": 181, "vitD_ug": 0,
+      "magnesium_mg": 25, "potassium_mg": 401, "iron_mg": 1.7, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:potato-baked",
+    "source": "seed",
+    "name": "Potato, baked, flesh and skin",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 173 }
+    ],
+    "per100g": {
+      "kcal": 93, "protein_g": 2.5, "carb_g": 21.1, "fat_g": 0.1, "fiber_g": 2.2,
+      "sugar_g": 1.2, "sodium_mg": 6, "calcium_mg": 15, "vitD_ug": 0,
+      "magnesium_mg": 28, "potassium_mg": 535, "iron_mg": 1.08, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:sweet-potato-baked",
+    "source": "seed",
+    "name": "Sweet potato, baked, flesh",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium", "grams": 114 }
+    ],
+    "per100g": {
+      "kcal": 90, "protein_g": 2.0, "carb_g": 20.7, "fat_g": 0.2, "fiber_g": 3.3,
+      "sugar_g": 6.5, "sodium_mg": 36, "calcium_mg": 38, "vitD_ug": 0,
+      "magnesium_mg": 27, "potassium_mg": 475, "iron_mg": 0.69, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:mushroom-raw",
+    "source": "seed",
+    "name": "Mushroom, white, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, sliced", "grams": 70 }
+    ],
+    "per100g": {
+      "kcal": 22, "protein_g": 3.1, "carb_g": 3.3, "fat_g": 0.3, "fiber_g": 1.0,
+      "sugar_g": 2.0, "sodium_mg": 5, "calcium_mg": 3, "vitD_ug": 0.2,
+      "magnesium_mg": 9, "potassium_mg": 318, "iron_mg": 0.5, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:rice-white-cooked",
+    "source": "seed",
+    "name": "Rice, white, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 158 }
+    ],
+    "per100g": {
+      "kcal": 130, "protein_g": 2.7, "carb_g": 28.2, "fat_g": 0.3, "fiber_g": 0.4,
+      "sugar_g": 0.1, "sodium_mg": 1, "calcium_mg": 10, "vitD_ug": 0,
+      "magnesium_mg": 12, "potassium_mg": 35, "iron_mg": 0.2, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:rice-brown-cooked",
+    "source": "seed",
+    "name": "Rice, brown, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 195 }
+    ],
+    "per100g": {
+      "kcal": 123, "protein_g": 2.7, "carb_g": 25.6, "fat_g": 1.0, "fiber_g": 1.6,
+      "sugar_g": 0.4, "sodium_mg": 4, "calcium_mg": 10, "vitD_ug": 0,
+      "magnesium_mg": 39, "potassium_mg": 86, "iron_mg": 0.42, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:oats-rolled-dry",
+    "source": "seed",
+    "name": "Oats, rolled, dry",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1/2 cup dry", "grams": 40 }
+    ],
+    "per100g": {
+      "kcal": 389, "protein_g": 16.9, "carb_g": 66.3, "fat_g": 6.9, "fiber_g": 10.6,
+      "sugar_g": 0, "sodium_mg": 2, "calcium_mg": 54, "vitD_ug": 0,
+      "magnesium_mg": 177, "potassium_mg": 429, "iron_mg": 4.72, "omega3_g": 0.11
+    }
+  },
+  {
+    "id": "seed:quinoa-cooked",
+    "source": "seed",
+    "name": "Quinoa, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 185 }
+    ],
+    "per100g": {
+      "kcal": 120, "protein_g": 4.4, "carb_g": 21.3, "fat_g": 1.9, "fiber_g": 2.8,
+      "sugar_g": 0.9, "sodium_mg": 7, "calcium_mg": 17, "vitD_ug": 0,
+      "magnesium_mg": 64, "potassium_mg": 172, "iron_mg": 1.49, "omega3_g": 0.06
+    }
+  },
+  {
+    "id": "seed:pasta-cooked",
+    "source": "seed",
+    "name": "Pasta, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 140 }
+    ],
+    "per100g": {
+      "kcal": 131, "protein_g": 5.1, "carb_g": 25.0, "fat_g": 1.1, "fiber_g": 1.8,
+      "sugar_g": 0.6, "sodium_mg": 1, "calcium_mg": 7, "vitD_ug": 0,
+      "magnesium_mg": 18, "potassium_mg": 44, "iron_mg": 0.9, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:bread-wholewheat",
+    "source": "seed",
+    "name": "Bread, whole wheat",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 slice", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 247, "protein_g": 13.0, "carb_g": 41.3, "fat_g": 3.4, "fiber_g": 6.8,
+      "sugar_g": 5.6, "sodium_mg": 450, "calcium_mg": 107, "vitD_ug": 0,
+      "magnesium_mg": 65, "potassium_mg": 248, "iron_mg": 2.5, "omega3_g": 0.1
+    }
+  },
+  {
+    "id": "seed:bread-white",
+    "source": "seed",
+    "name": "Bread, white",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 slice", "grams": 25 }
+    ],
+    "per100g": {
+      "kcal": 265, "protein_g": 9.0, "carb_g": 49.4, "fat_g": 3.2, "fiber_g": 2.7,
+      "sugar_g": 5.0, "sodium_mg": 490, "calcium_mg": 151, "vitD_ug": 0,
+      "magnesium_mg": 24, "potassium_mg": 115, "iron_mg": 3.6, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:lentils-cooked",
+    "source": "seed",
+    "name": "Lentils, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 198 }
+    ],
+    "per100g": {
+      "kcal": 116, "protein_g": 9.0, "carb_g": 20.1, "fat_g": 0.4, "fiber_g": 7.9,
+      "sugar_g": 1.8, "sodium_mg": 2, "calcium_mg": 19, "vitD_ug": 0,
+      "magnesium_mg": 36, "potassium_mg": 369, "iron_mg": 3.33, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:chickpeas-cooked",
+    "source": "seed",
+    "name": "Chickpeas, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 164 }
+    ],
+    "per100g": {
+      "kcal": 164, "protein_g": 8.9, "carb_g": 27.4, "fat_g": 2.6, "fiber_g": 7.6,
+      "sugar_g": 4.8, "sodium_mg": 7, "calcium_mg": 49, "vitD_ug": 0,
+      "magnesium_mg": 48, "potassium_mg": 291, "iron_mg": 2.89, "omega3_g": 0.04
+    }
+  },
+  {
+    "id": "seed:black-beans-cooked",
+    "source": "seed",
+    "name": "Black beans, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 172 }
+    ],
+    "per100g": {
+      "kcal": 132, "protein_g": 8.9, "carb_g": 23.7, "fat_g": 0.5, "fiber_g": 8.7,
+      "sugar_g": 0.3, "sodium_mg": 1, "calcium_mg": 27, "vitD_ug": 0,
+      "magnesium_mg": 70, "potassium_mg": 355, "iron_mg": 2.1, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:kidney-beans-cooked",
+    "source": "seed",
+    "name": "Kidney beans, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup cooked", "grams": 177 }
+    ],
+    "per100g": {
+      "kcal": 127, "protein_g": 8.7, "carb_g": 22.8, "fat_g": 0.5, "fiber_g": 6.4,
+      "sugar_g": 0.3, "sodium_mg": 2, "calcium_mg": 28, "vitD_ug": 0,
+      "magnesium_mg": 45, "potassium_mg": 403, "iron_mg": 2.2, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:tofu-firm",
+    "source": "seed",
+    "name": "Tofu, firm",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1/2 cup", "grams": 126 }
+    ],
+    "per100g": {
+      "kcal": 144, "protein_g": 15.8, "carb_g": 3.9, "fat_g": 8.7, "fiber_g": 2.3,
+      "sugar_g": 0.6, "sodium_mg": 14, "calcium_mg": 350, "vitD_ug": 0,
+      "magnesium_mg": 30, "potassium_mg": 121, "iron_mg": 2.7, "omega3_g": 0.36
+    }
+  },
+  {
+    "id": "seed:edamame-cooked",
+    "source": "seed",
+    "name": "Edamame, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 155 }
+    ],
+    "per100g": {
+      "kcal": 122, "protein_g": 11.9, "carb_g": 8.9, "fat_g": 5.2, "fiber_g": 5.2,
+      "sugar_g": 2.2, "sodium_mg": 6, "calcium_mg": 63, "vitD_ug": 0,
+      "magnesium_mg": 64, "potassium_mg": 436, "iron_mg": 2.27, "omega3_g": 0.28
+    }
+  },
+  {
+    "id": "seed:almonds-raw",
+    "source": "seed",
+    "name": "Almonds, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 oz (23 nuts)", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 579, "protein_g": 21.2, "carb_g": 21.6, "fat_g": 49.9, "fiber_g": 12.5,
+      "sugar_g": 4.4, "sodium_mg": 1, "calcium_mg": 269, "vitD_ug": 0,
+      "magnesium_mg": 270, "potassium_mg": 733, "iron_mg": 3.71, "omega3_g": 0.01
+    }
+  },
+  {
+    "id": "seed:walnuts-raw",
+    "source": "seed",
+    "name": "Walnuts, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 oz (14 halves)", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 654, "protein_g": 15.2, "carb_g": 13.7, "fat_g": 65.2, "fiber_g": 6.7,
+      "sugar_g": 2.6, "sodium_mg": 2, "calcium_mg": 98, "vitD_ug": 0,
+      "magnesium_mg": 158, "potassium_mg": 441, "iron_mg": 2.91, "omega3_g": 9.08
+    }
+  },
+  {
+    "id": "seed:pumpkin-seeds-raw",
+    "source": "seed",
+    "name": "Pumpkin seeds, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 oz", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 559, "protein_g": 30.2, "carb_g": 10.7, "fat_g": 49.1, "fiber_g": 6.0,
+      "sugar_g": 1.4, "sodium_mg": 7, "calcium_mg": 46, "vitD_ug": 0,
+      "magnesium_mg": 592, "potassium_mg": 809, "iron_mg": 8.82, "omega3_g": 0.06
+    }
+  },
+  {
+    "id": "seed:chia-seeds-dry",
+    "source": "seed",
+    "name": "Chia seeds, dry",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 12 }
+    ],
+    "per100g": {
+      "kcal": 486, "protein_g": 16.5, "carb_g": 42.1, "fat_g": 30.7, "fiber_g": 34.4,
+      "sugar_g": 0, "sodium_mg": 16, "calcium_mg": 631, "vitD_ug": 0,
+      "magnesium_mg": 335, "potassium_mg": 407, "iron_mg": 7.72, "omega3_g": 17.83
+    }
+  },
+  {
+    "id": "seed:flaxseed-ground",
+    "source": "seed",
+    "name": "Flaxseed, ground",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 7 }
+    ],
+    "per100g": {
+      "kcal": 534, "protein_g": 18.3, "carb_g": 28.9, "fat_g": 42.2, "fiber_g": 27.3,
+      "sugar_g": 1.6, "sodium_mg": 30, "calcium_mg": 255, "vitD_ug": 0,
+      "magnesium_mg": 392, "potassium_mg": 813, "iron_mg": 5.73, "omega3_g": 22.8
+    }
+  },
+  {
+    "id": "seed:peanut-butter",
+    "source": "seed",
+    "name": "Peanut butter",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 16 }
+    ],
+    "per100g": {
+      "kcal": 588, "protein_g": 25.1, "carb_g": 20.0, "fat_g": 50.4, "fiber_g": 6.0,
+      "sugar_g": 9.2, "sodium_mg": 459, "calcium_mg": 43, "vitD_ug": 0,
+      "magnesium_mg": 168, "potassium_mg": 649, "iron_mg": 1.87, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:cashews-raw",
+    "source": "seed",
+    "name": "Cashews, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 oz (18 nuts)", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 553, "protein_g": 18.2, "carb_g": 30.2, "fat_g": 43.9, "fiber_g": 3.3,
+      "sugar_g": 5.9, "sodium_mg": 12, "calcium_mg": 37, "vitD_ug": 0,
+      "magnesium_mg": 292, "potassium_mg": 660, "iron_mg": 6.68, "omega3_g": 0.06
+    }
+  },
+  {
+    "id": "seed:milk-whole",
+    "source": "seed",
+    "name": "Milk, whole, fortified",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 244 }
+    ],
+    "per100g": {
+      "kcal": 61, "protein_g": 3.2, "carb_g": 4.8, "fat_g": 3.3, "fiber_g": 0,
+      "sugar_g": 5.1, "sodium_mg": 40, "calcium_mg": 113, "vitD_ug": 1.2,
+      "magnesium_mg": 10, "potassium_mg": 132, "iron_mg": 0.03, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:milk-skim",
+    "source": "seed",
+    "name": "Milk, skim, fortified",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 245 }
+    ],
+    "per100g": {
+      "kcal": 34, "protein_g": 3.4, "carb_g": 5.0, "fat_g": 0.1, "fiber_g": 0,
+      "sugar_g": 5.1, "sodium_mg": 42, "calcium_mg": 122, "vitD_ug": 1.2,
+      "magnesium_mg": 11, "potassium_mg": 156, "iron_mg": 0.03, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:yogurt-greek-plain",
+    "source": "seed",
+    "name": "Yogurt, Greek, plain, whole milk",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 245 }
+    ],
+    "per100g": {
+      "kcal": 97, "protein_g": 9.0, "carb_g": 3.9, "fat_g": 5.0, "fiber_g": 0,
+      "sugar_g": 3.9, "sodium_mg": 34, "calcium_mg": 100, "vitD_ug": 0,
+      "magnesium_mg": 11, "potassium_mg": 141, "iron_mg": 0.04, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:cottage-cheese",
+    "source": "seed",
+    "name": "Cottage cheese, low-fat (2%)",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 226 }
+    ],
+    "per100g": {
+      "kcal": 84, "protein_g": 11.1, "carb_g": 4.3, "fat_g": 2.5, "fiber_g": 0,
+      "sugar_g": 3.6, "sodium_mg": 364, "calcium_mg": 83, "vitD_ug": 0,
+      "magnesium_mg": 8, "potassium_mg": 104, "iron_mg": 0.14, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:cheddar-cheese",
+    "source": "seed",
+    "name": "Cheddar cheese",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 slice", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 403, "protein_g": 24.9, "carb_g": 1.3, "fat_g": 33.1, "fiber_g": 0,
+      "sugar_g": 0.5, "sodium_mg": 621, "calcium_mg": 721, "vitD_ug": 0.6,
+      "magnesium_mg": 28, "potassium_mg": 98, "iron_mg": 0.68, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:mozzarella-cheese",
+    "source": "seed",
+    "name": "Mozzarella cheese, part-skim",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 slice", "grams": 28 }
+    ],
+    "per100g": {
+      "kcal": 254, "protein_g": 24.3, "carb_g": 2.8, "fat_g": 15.9, "fiber_g": 0,
+      "sugar_g": 1.0, "sodium_mg": 396, "calcium_mg": 731, "vitD_ug": 0.4,
+      "magnesium_mg": 22, "potassium_mg": 95, "iron_mg": 0.29, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:egg-large-raw",
+    "source": "seed",
+    "name": "Egg, whole, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 large egg", "grams": 50 }
+    ],
+    "per100g": {
+      "kcal": 143, "protein_g": 12.6, "carb_g": 0.7, "fat_g": 9.5, "fiber_g": 0,
+      "sugar_g": 0.4, "sodium_mg": 142, "calcium_mg": 50, "vitD_ug": 2.0,
+      "magnesium_mg": 12, "potassium_mg": 138, "iron_mg": 1.75, "omega3_g": 0.08
+    }
+  },
+  {
+    "id": "seed:chicken-breast-cooked",
+    "source": "seed",
+    "name": "Chicken breast, cooked, skinless",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 breast", "grams": 172 }
+    ],
+    "per100g": {
+      "kcal": 165, "protein_g": 31.0, "carb_g": 0, "fat_g": 3.6, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 74, "calcium_mg": 15, "vitD_ug": 0.1,
+      "magnesium_mg": 29, "potassium_mg": 256, "iron_mg": 1.04, "omega3_g": 0.02
+    }
+  },
+  {
+    "id": "seed:chicken-thigh-cooked",
+    "source": "seed",
+    "name": "Chicken thigh, cooked, skinless",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 thigh", "grams": 116 }
+    ],
+    "per100g": {
+      "kcal": 209, "protein_g": 26.0, "carb_g": 0, "fat_g": 10.9, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 90, "calcium_mg": 12, "vitD_ug": 0.2,
+      "magnesium_mg": 23, "potassium_mg": 229, "iron_mg": 1.3, "omega3_g": 0.03
+    }
+  },
+  {
+    "id": "seed:turkey-breast-cooked",
+    "source": "seed",
+    "name": "Turkey breast, cooked, skinless",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "3 oz", "grams": 85 }
+    ],
+    "per100g": {
+      "kcal": 135, "protein_g": 30.1, "carb_g": 0, "fat_g": 0.7, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 63, "calcium_mg": 8, "vitD_ug": 0,
+      "magnesium_mg": 28, "potassium_mg": 249, "iron_mg": 1.19, "omega3_g": 0.02
+    }
+  },
+  {
+    "id": "seed:beef-ground-85-cooked",
+    "source": "seed",
+    "name": "Beef, ground, 85% lean, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "3 oz", "grams": 85 }
+    ],
+    "per100g": {
+      "kcal": 250, "protein_g": 25.9, "carb_g": 0, "fat_g": 15.4, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 72, "calcium_mg": 18, "vitD_ug": 0.1,
+      "magnesium_mg": 20, "potassium_mg": 318, "iron_mg": 2.35, "omega3_g": 0.04
+    }
+  },
+  {
+    "id": "seed:pork-loin-cooked",
+    "source": "seed",
+    "name": "Pork loin, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "3 oz", "grams": 85 }
+    ],
+    "per100g": {
+      "kcal": 206, "protein_g": 28.7, "carb_g": 0, "fat_g": 9.4, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 55, "calcium_mg": 9, "vitD_ug": 0.5,
+      "magnesium_mg": 25, "potassium_mg": 372, "iron_mg": 0.8, "omega3_g": 0.02
+    }
+  },
+  {
+    "id": "seed:salmon-cooked",
+    "source": "seed",
+    "name": "Salmon, Atlantic, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 fillet", "grams": 178 }
+    ],
+    "per100g": {
+      "kcal": 208, "protein_g": 22.1, "carb_g": 0, "fat_g": 12.4, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 59, "calcium_mg": 9, "vitD_ug": 14.5,
+      "magnesium_mg": 27, "potassium_mg": 384, "iron_mg": 0.34, "omega3_g": 2.15
+    }
+  },
+  {
+    "id": "seed:sardines-canned",
+    "source": "seed",
+    "name": "Sardines, canned in oil, drained",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 can", "grams": 92 }
+    ],
+    "per100g": {
+      "kcal": 208, "protein_g": 24.6, "carb_g": 0, "fat_g": 11.5, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 505, "calcium_mg": 382, "vitD_ug": 4.8,
+      "magnesium_mg": 39, "potassium_mg": 397, "iron_mg": 2.92, "omega3_g": 1.48
+    }
+  },
+  {
+    "id": "seed:tuna-canned-water",
+    "source": "seed",
+    "name": "Tuna, canned in water, drained",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 can", "grams": 142 }
+    ],
+    "per100g": {
+      "kcal": 116, "protein_g": 25.5, "carb_g": 0, "fat_g": 0.8, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 247, "calcium_mg": 11, "vitD_ug": 1.7,
+      "magnesium_mg": 27, "potassium_mg": 237, "iron_mg": 1.3, "omega3_g": 0.26
+    }
+  },
+  {
+    "id": "seed:shrimp-cooked",
+    "source": "seed",
+    "name": "Shrimp, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "4 large", "grams": 22 }
+    ],
+    "per100g": {
+      "kcal": 99, "protein_g": 24.0, "carb_g": 0.2, "fat_g": 0.3, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 111, "calcium_mg": 70, "vitD_ug": 0,
+      "magnesium_mg": 39, "potassium_mg": 259, "iron_mg": 0.5, "omega3_g": 0.3
+    }
+  },
+  {
+    "id": "seed:cod-cooked",
+    "source": "seed",
+    "name": "Cod, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 fillet", "grams": 180 }
+    ],
+    "per100g": {
+      "kcal": 105, "protein_g": 22.8, "carb_g": 0, "fat_g": 0.9, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 78, "calcium_mg": 16, "vitD_ug": 1.4,
+      "magnesium_mg": 34, "potassium_mg": 371, "iron_mg": 0.38, "omega3_g": 0.19
+    }
+  },
+  {
+    "id": "seed:mackerel-cooked",
+    "source": "seed",
+    "name": "Mackerel, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 fillet", "grams": 88 }
+    ],
+    "per100g": {
+      "kcal": 262, "protein_g": 23.9, "carb_g": 0, "fat_g": 17.8, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 95, "calcium_mg": 15, "vitD_ug": 13.8,
+      "magnesium_mg": 76, "potassium_mg": 314, "iron_mg": 1.63, "omega3_g": 1.89
+    }
+  },
+  {
+    "id": "seed:trout-cooked",
+    "source": "seed",
+    "name": "Trout, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 fillet", "grams": 143 }
+    ],
+    "per100g": {
+      "kcal": 190, "protein_g": 26.6, "carb_g": 0, "fat_g": 8.4, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 52, "calcium_mg": 73, "vitD_ug": 12.5,
+      "magnesium_mg": 33, "potassium_mg": 463, "iron_mg": 2.07, "omega3_g": 1.15
+    }
+  },
+  {
+    "id": "seed:olive-oil",
+    "source": "seed",
+    "name": "Olive oil",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 14 }
+    ],
+    "per100g": {
+      "kcal": 884, "protein_g": 0, "carb_g": 0, "fat_g": 100, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 2, "calcium_mg": 1, "vitD_ug": 0,
+      "magnesium_mg": 0, "potassium_mg": 1, "iron_mg": 0.56, "omega3_g": 0.76
+    }
+  },
+  {
+    "id": "seed:butter",
+    "source": "seed",
+    "name": "Butter, salted",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 14 }
+    ],
+    "per100g": {
+      "kcal": 717, "protein_g": 0.9, "carb_g": 0.1, "fat_g": 81.1, "fiber_g": 0,
+      "sugar_g": 0.1, "sodium_mg": 643, "calcium_mg": 24, "vitD_ug": 0.6,
+      "magnesium_mg": 2, "potassium_mg": 24, "iron_mg": 0.02, "omega3_g": 0.31
+    }
+  },
+  {
+    "id": "seed:coconut-oil",
+    "source": "seed",
+    "name": "Coconut oil",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 14 }
+    ],
+    "per100g": {
+      "kcal": 862, "protein_g": 0, "carb_g": 0, "fat_g": 100, "fiber_g": 0,
+      "sugar_g": 0, "sodium_mg": 0, "calcium_mg": 1, "vitD_ug": 0,
+      "magnesium_mg": 0, "potassium_mg": 1, "iron_mg": 0.04, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:oat-milk",
+    "source": "seed",
+    "name": "Oat milk, fortified",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 240 }
+    ],
+    "per100g": {
+      "kcal": 47, "protein_g": 1.0, "carb_g": 7.5, "fat_g": 1.5, "fiber_g": 0.8,
+      "sugar_g": 4.4, "sodium_mg": 51, "calcium_mg": 120, "vitD_ug": 1.1,
+      "magnesium_mg": 6, "potassium_mg": 120, "iron_mg": 0.36, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:almond-milk",
+    "source": "seed",
+    "name": "Almond milk, unsweetened, fortified",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 240 }
+    ],
+    "per100g": {
+      "kcal": 15, "protein_g": 0.6, "carb_g": 0.6, "fat_g": 1.2, "fiber_g": 0.3,
+      "sugar_g": 0.1, "sodium_mg": 63, "calcium_mg": 122, "vitD_ug": 1.1,
+      "magnesium_mg": 6, "potassium_mg": 66, "iron_mg": 0.28, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:lettuce-romaine-raw",
+    "source": "seed",
+    "name": "Lettuce, romaine, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, shredded", "grams": 47 }
+    ],
+    "per100g": {
+      "kcal": 17, "protein_g": 1.2, "carb_g": 3.3, "fat_g": 0.3, "fiber_g": 2.1,
+      "sugar_g": 1.2, "sodium_mg": 8, "calcium_mg": 33, "vitD_ug": 0,
+      "magnesium_mg": 14, "potassium_mg": 247, "iron_mg": 0.97, "omega3_g": 0.03
+    }
+  },
+  {
+    "id": "seed:zucchini-raw",
+    "source": "seed",
+    "name": "Zucchini, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, sliced", "grams": 124 }
+    ],
+    "per100g": {
+      "kcal": 17, "protein_g": 1.2, "carb_g": 3.1, "fat_g": 0.3, "fiber_g": 1.0,
+      "sugar_g": 2.5, "sodium_mg": 8, "calcium_mg": 16, "vitD_ug": 0,
+      "magnesium_mg": 18, "potassium_mg": 261, "iron_mg": 0.37, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:cauliflower-raw",
+    "source": "seed",
+    "name": "Cauliflower, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, chopped", "grams": 107 }
+    ],
+    "per100g": {
+      "kcal": 25, "protein_g": 1.9, "carb_g": 5.0, "fat_g": 0.3, "fiber_g": 2.0,
+      "sugar_g": 1.9, "sodium_mg": 30, "calcium_mg": 22, "vitD_ug": 0,
+      "magnesium_mg": 15, "potassium_mg": 299, "iron_mg": 0.42, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:green-peas-cooked",
+    "source": "seed",
+    "name": "Green peas, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup", "grams": 160 }
+    ],
+    "per100g": {
+      "kcal": 84, "protein_g": 5.4, "carb_g": 15.6, "fat_g": 0.2, "fiber_g": 5.5,
+      "sugar_g": 5.9, "sodium_mg": 3, "calcium_mg": 27, "vitD_ug": 0,
+      "magnesium_mg": 33, "potassium_mg": 244, "iron_mg": 1.47, "omega3_g": 0.03
+    }
+  },
+  {
+    "id": "seed:corn-cooked",
+    "source": "seed",
+    "name": "Corn, sweet, cooked",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 medium ear", "grams": 103 }
+    ],
+    "per100g": {
+      "kcal": 96, "protein_g": 3.4, "carb_g": 21.0, "fat_g": 1.5, "fiber_g": 2.4,
+      "sugar_g": 4.5, "sodium_mg": 15, "calcium_mg": 2, "vitD_ug": 0,
+      "magnesium_mg": 26, "potassium_mg": 218, "iron_mg": 0.52, "omega3_g": 0.02
+    }
+  },
+  {
+    "id": "seed:pineapple-raw",
+    "source": "seed",
+    "name": "Pineapple, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, chunks", "grams": 165 }
+    ],
+    "per100g": {
+      "kcal": 50, "protein_g": 0.5, "carb_g": 13.1, "fat_g": 0.1, "fiber_g": 1.4,
+      "sugar_g": 9.9, "sodium_mg": 1, "calcium_mg": 13, "vitD_ug": 0,
+      "magnesium_mg": 12, "potassium_mg": 109, "iron_mg": 0.29, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:watermelon-raw",
+    "source": "seed",
+    "name": "Watermelon, raw",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 cup, diced", "grams": 152 }
+    ],
+    "per100g": {
+      "kcal": 30, "protein_g": 0.6, "carb_g": 7.6, "fat_g": 0.2, "fiber_g": 0.4,
+      "sugar_g": 6.2, "sodium_mg": 1, "calcium_mg": 7, "vitD_ug": 0,
+      "magnesium_mg": 10, "potassium_mg": 112, "iron_mg": 0.24, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:raisins",
+    "source": "seed",
+    "name": "Raisins",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1/4 cup", "grams": 41 }
+    ],
+    "per100g": {
+      "kcal": 299, "protein_g": 3.1, "carb_g": 79.2, "fat_g": 0.5, "fiber_g": 3.7,
+      "sugar_g": 59.2, "sodium_mg": 11, "calcium_mg": 50, "vitD_ug": 0,
+      "magnesium_mg": 32, "potassium_mg": 749, "iron_mg": 1.88, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:dates",
+    "source": "seed",
+    "name": "Dates, dried",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 date", "grams": 24 }
+    ],
+    "per100g": {
+      "kcal": 277, "protein_g": 1.8, "carb_g": 75.0, "fat_g": 0.2, "fiber_g": 6.7,
+      "sugar_g": 63.4, "sodium_mg": 1, "calcium_mg": 39, "vitD_ug": 0,
+      "magnesium_mg": 43, "potassium_mg": 656, "iron_mg": 0.9, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:honey",
+    "source": "seed",
+    "name": "Honey",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 tbsp", "grams": 21 }
+    ],
+    "per100g": {
+      "kcal": 304, "protein_g": 0.3, "carb_g": 82.4, "fat_g": 0, "fiber_g": 0.2,
+      "sugar_g": 82.1, "sodium_mg": 4, "calcium_mg": 6, "vitD_ug": 0,
+      "magnesium_mg": 2, "potassium_mg": 52, "iron_mg": 0.42, "omega3_g": 0
+    }
+  },
+  {
+    "id": "seed:dark-chocolate",
+    "source": "seed",
+    "name": "Dark chocolate, 70-85% cacao",
+    "servings": [
+      { "label": "100 g", "grams": 100 },
+      { "label": "1 square", "grams": 10 }
+    ],
+    "per100g": {
+      "kcal": 598, "protein_g": 7.8, "carb_g": 45.9, "fat_g": 42.6, "fiber_g": 10.9,
+      "sugar_g": 24.0, "sodium_mg": 20, "calcium_mg": 73, "vitD_ug": 0,
+      "magnesium_mg": 228, "potassium_mg": 715, "iron_mg": 11.9, "omega3_g": 0.1
+    }
+  }
+]
