@@ -1,7 +1,7 @@
 {
   "name": "Upright — Back-Recovery & Posture",
   "short_name": "Upright",
-  "description": "A private, local-first companion for back recovery: posture, pain trends, rehab exercises, meals and goals. All data stays on your device.",
+  "description": "A private, local-first companion for back recovery: posture, pain trends, rehab exercises, nutrition and goals. All your logged data stays on your device (online food search sends only your search words).",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
