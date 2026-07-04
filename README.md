@@ -80,7 +80,11 @@ After the first visit it works offline.
 - **Rehab exercises** — seeded library + your own (dialog editor), hold/rest
   timers with set-progress dots and audio cues, done-today tracking.
 - **Meal plan / Food** — an editable anti-inflammatory week (today
-  highlighted) and quick meal logging with dietary tags + weekly summaries.
+  highlighted), plus a proper food tracker: USDA-backed food search (with an
+  offline starter set of ~76 whole foods, and your own custom foods), a
+  portion picker with a live nutrient preview, per-entry nutrient snapshots, a
+  daily rollup (calorie ring, macro bars, and a full micronutrient table
+  against your targets), and a weekly calories/protein trend.
 - **Ergonomics & sleep** — illustrated reference cards and a daily checklist
   with a progress bar.
 - **Physio visit report** — printable summary: pain trend + body-map heat,
@@ -88,8 +92,9 @@ After the first visit it works offline.
   meds frequency, and your recorded physio constraints.
 - **Settings** — sticky section nav; theme, reminders, goals, camera (incl.
   overlay/sound toggles and sensitivity), flare reduction, wellbeing options,
-  streak forgiveness, physio instructions, backup, per-log **CSV export**,
-  and a double-guarded reset.
+  streak forgiveness, physio instructions, nutrition (USDA API key,
+  online-lookup toggle, editable daily nutrient targets), backup, per-log
+  **CSV export**, and a double-guarded reset.
 - **Backup** — export everything to one JSON file; import with Merge or
   Replace (old pre-v2 backups import cleanly).
 - **Onboarding** — a gentle, skippable 3-step first-run (safety → goals →
@@ -97,12 +102,18 @@ After the first visit it works offline.
 
 ## Privacy
 
-No network requests are made for your data. Libraries (TensorFlow.js, the
+No network requests are made for your logged data. Libraries (TensorFlow.js, the
 MoveNet pose model) are **vendored locally** in `/vendor` rather than loaded
 from a CDN — that's what makes “works offline” and “frames never leave your
 device” actually true. The camera posture AI runs entirely in your browser and
 **never stores or uploads frames** — only per-day aggregate numbers (minutes
 monitored, % good, slouch counts) are saved.
+
+**Food search** is the one feature that reaches the network: when you search
+foods, only the words you type are sent to USDA's public FoodData Central
+database to fetch nutrition facts. It's optional (toggle it off in Settings),
+your logged food and all other data never leave the device, and logging
+always works fully offline using the bundled + saved foods.
 
 ## Tests (no build step)
 
@@ -111,7 +122,8 @@ once in the browser at <http://localhost:8000/tests/>:
 
 `dates`, `backup`, `posture-heuristic`, `schema`, `posture-score`,
 `cam-session`, `alert-ladder`, `cam-diagnostics`, `flare`, `review`,
-`insights`, `csv`, `body-regions` — **131 assertions**.
+`insights`, `csv`, `body-regions`, `nutrition`, `foods-starter` — **167
+assertions**.
 
 ## Notes & decisions
 
@@ -137,13 +149,13 @@ once in the browser at <http://localhost:8000/tests/>:
 index.html, start.command, manifest.webmanifest, service-worker.js
 /styles   tokens, base, components, app
 /js/core  events, dates, schema, store, backup, ui, notify, theme, charts,
-          icons, flare, insights, review, csv, body-regions
+          icons, flare, insights, review, csv, body-regions, nutrition
 /js/modules  dashboard, pain-trends, goals, posture-reminders, posture-camera,
              posture-heuristic, posture-score, cam-pipeline, cam-overlay,
              cam-session, alert-ladder, cam-diagnostics, body-map, breathing,
              wellbeing, insights, flare, onboarding, settings,
              ergo-sleep-guide, exercises, meal-plan, meal-log, report
-/data     meal-plan, exercises, ergo/sleep content (JSON)
+/data     meal-plan, exercises, ergo/sleep content, foods-starter (JSON)
 /vendor   tfjs + pose-detection + MoveNet model (local, offline)
-/tests    no-build test page + node-runnable suites (131 assertions)
+/tests    no-build test page + node-runnable suites (167 assertions)
 ```

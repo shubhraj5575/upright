@@ -8,7 +8,7 @@
 //
 // Bump CACHE_VERSION whenever shipping changed assets to retire old caches.
 
-const CACHE_VERSION = 'upright-v2';
+const CACHE_VERSION = 'upright-v3';
 
 const SHELL = [
   './',
@@ -36,6 +36,7 @@ const SHELL = [
   'js/core/review.js',
   'js/core/csv.js',
   'js/core/body-regions.js',
+  'js/core/nutrition.js',
   'js/modules/dashboard.js',
   'js/modules/pain-trends.js',
   'js/modules/goals.js',
@@ -62,6 +63,7 @@ const SHELL = [
   'js/modules/report.js',
   'data/ergo-sleep-content.json',
   'data/exercises-starter.json',
+  'data/foods-starter.json',
   'data/meal-plan-starter.json',
 ];
 
