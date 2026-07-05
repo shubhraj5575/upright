@@ -12,6 +12,7 @@
 
 import { addDays, diffDays } from './dates.js';
 import { flareDayKeys } from './flare.js';
+import { dailyTotals } from './nutrition.js';
 
 export const MIN_N = 5;
 export const MIN_DELTA_SCORE = 0.7; // pain/stiffness on the 0–10 scale
@@ -98,7 +99,8 @@ function buildCtx(data, today) {
   const keys = windowKeys(today);
   const flareDays = flareDayKeys(data.flareLog || [], today);
   const goals = ((data.settings || {}).goals) || { waterMl: 2000, steps: 6000 };
-  return { data, today, keys, flareDays, goals };
+  const nutritionTargets = ((data.settings || {}).nutrition || {}).targets || {};
+  return { data, today, keys, flareDays, goals, nutritionTargets };
 }
 
 /** pain/stiffness value for a day, excluding flare days (returns null). */
@@ -416,6 +418,49 @@ function ruleBreaksStiffness(ctx) {
   });
 }
 
+/** A day's logged protein grams, or null if no nutrient-bearing entry that day. */
+function proteinOn(ctx, day) {
+  const entries = (ctx.data.mealLog || {})[day] || [];
+  if (!entries.some((e) => e.nutrients)) return null;
+  return dailyTotals(entries).protein_g;
+}
+
+function ruleProteinStiffness(ctx) {
+  const target = ctx.nutritionTargets.protein_g;
+  const rows = ctx.keys.map((day) => {
+    const p = proteinOn(ctx, day);
+    const split = (target > 0 && p != null) ? (p >= target ? 'a' : p < target * 0.6 ? 'b' : null) : null;
+    return { day, split, value: split ? scoreOn(ctx, day, 'stiffness') : null };
+  });
+  const cmp = compareDays(rows);
+  if (!cmp.unlocked) {
+    return lockedResult('protein-stiffness', 'habits',
+      'Log your food (with nutrients) and daily stiffness together — 5 protein-target-met days and 5 lower-protein days unlock this comparison.');
+  }
+  return comparisonResult({
+    id: 'protein-stiffness', group: 'habits', cmp, minDelta: MIN_DELTA_SCORE,
+    flaggedExclusions: (ctx.data.flareLog || []).length > 0,
+    neutralText: 'Stiffness on days you met your protein target looks about the same as on lower-protein days',
+    textFor: (c) => `On days you met your protein target, stiffness averaged ${round1(c.a.mean)}/10 (${plural(c.a.n, 'day')}), vs ${round1(c.b.mean)}/10 on lower-protein days (${plural(c.b.n, 'day')}).`,
+  });
+}
+
+function ruleFiberIntake(ctx) {
+  const target = ctx.nutritionTargets.fiber_g;
+  const days = ctx.keys.slice(-14).filter((d) => ((ctx.data.mealLog || {})[d] || []).some((e) => e.nutrients));
+  if (!(target > 0) || days.length < MIN_N) {
+    return lockedResult('fiber-intake', 'habits',
+      'Log a few days of food with nutrients — once you have 5 logged-food days in the last two weeks, Upright can show how often you hit your fiber target.');
+  }
+  const met = days.filter((d) => dailyTotals((ctx.data.mealLog || {})[d]).fiber_g >= target).length;
+  const pct = Math.round((met / days.length) * 100);
+  return {
+    id: 'fiber-intake', group: 'habits', unlocked: true, direction: 'none',
+    strength: pct >= 70 ? 'moderate' : 'weak',
+    text: `Over your logged-food days in the last two weeks, you hit your fiber target on ${met} of ${plural(days.length, 'day')} (${pct}%).`,
+  };
+}
+
 const RULES = [
   ruleSleepStiffness,
   ruleSleepQualityPain,
@@ -431,6 +476,8 @@ const RULES = [
   ruleMoodPain,
   ruleFlareRecovery,
   ruleBreaksStiffness,
+  ruleProteinStiffness,
+  ruleFiberIntake,
 ];
 
 export const GROUPS = [

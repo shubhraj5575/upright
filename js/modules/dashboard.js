@@ -16,6 +16,7 @@ import * as posture from './posture-reminders.js';
 import * as postureCamera from './posture-camera.js';
 import * as exercises from './exercises.js';
 import * as mealLog from './meal-log.js';
+import { dailyTotals } from '../core/nutrition.js';
 import { activeFlare, activeFlareDays, flareDayKeys } from '../core/flare.js';
 import { buildInsights } from '../core/insights.js';
 import { isReviewReady } from '../core/review.js';
@@ -216,7 +217,7 @@ export function init(mountEl) {
     // A flat all-zero sparkline is noise, not signal — show nothing instead.
     const nonFlat = (vals) => (vals.some((v) => v != null && v !== 0) ? vals : null);
     const exSpark = nonFlat(seriesOf(7, (k) => (exLog[k] ? exLog[k].length : 0)));
-    const mealSpark = nonFlat(seriesOf(7, (k) => (mealsLog[k] ? mealsLog[k].length : 0)));
+    const kcalSpark = nonFlat(seriesOf(7, (k) => { const t = dailyTotals(mealsLog[k] || []); return t.kcal || null; }));
 
     const tiles = el('div', { class: 'grid' },
       statTile({
@@ -241,10 +242,13 @@ export function init(mountEl) {
         spark: exSpark,
       }),
       statTile({
-        iconName: 'utensils', label: 'Meals logged', href: '#/meals',
-        value: String(ml.countToday || 0),
-        sub: ml.countToday ? 'today' : 'None logged today',
-        spark: mealSpark,
+        iconName: 'utensils', label: ml.kcal ? 'Calories today' : 'Meals logged', href: '#/meals',
+        value: ml.kcal ? `${ml.kcal.toLocaleString()}` : String(ml.countToday || 0),
+        sub: ml.logged
+          ? `${ml.kcal} / ${ml.kcalTarget} kcal · ${ml.countToday} item${ml.countToday === 1 ? '' : 's'}`
+          : 'None logged today',
+        accent: ml.kcal && ml.kcalTarget && ml.kcal >= ml.kcalTarget * 0.7 && ml.kcal <= ml.kcalTarget * 1.1 ? 'var(--color-primary)' : null,
+        spark: kcalSpark,
       })
     );
 
@@ -278,6 +282,7 @@ export function init(mountEl) {
       painLog, sleepLog, postureSelfLog: postureLog, goalsLog: store.get('goalsLog'),
       exerciseLog: exLog, postureCamLog: store.get('postureCamLog'),
       activityLog: store.get('activityLog'), flareLog, settings: store.get('settings'),
+      mealLog: store.get('mealLog'),
     };
     const review = isReviewReady(data, todayKey(), (store.get('meta') || {}).lastReviewWeekSeen);
     if (review.ready) {

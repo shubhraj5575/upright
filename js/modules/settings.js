@@ -140,6 +140,61 @@ function goalsCard() {
   );
 }
 
+function nutritionCard() {
+  const nut = settings().nutrition || {};
+  const targets = nut.targets || {};
+
+  const keyInput = el('input', { class: 'input', type: 'password', value: nut.usdaApiKey || '',
+    onChange: (e) => {
+      patch((n) => { n.nutrition.usdaApiKey = e.target.value.trim(); });
+      toast('USDA API key saved.', { type: 'success' });
+    } });
+  const onlineLookup = el('input', { type: 'checkbox', checked: nut.onlineLookup !== false,
+    onChange: (e) => {
+      patch((n) => { n.nutrition.onlineLookup = e.target.checked; });
+      toast(e.target.checked ? 'Online lookup on.' : 'Online lookup off — local/saved foods only.', { type: 'info' });
+    } });
+
+  function targetField(label, key, min, max, step) {
+    return numberField(label, targets[key], min, max, step,
+      (v) => patch((n) => { n.nutrition.targets[key] = v; }));
+  }
+  const kcal = targetField('Calories (kcal)', 'kcal', 800, 5000, 50);
+  const protein = targetField('Protein (g)', 'protein_g', 20, 300, 5);
+  const carb = targetField('Carbs (g)', 'carb_g', 50, 600, 10);
+  const fat = targetField('Fat (g)', 'fat_g', 20, 200, 5);
+  const fiber = targetField('Fiber (g)', 'fiber_g', 10, 80, 1);
+  const sugar = targetField('Sugar (g)', 'sugar_g', 10, 200, 5);
+  const sodium = targetField('Sodium (mg)', 'sodium_mg', 500, 5000, 100);
+  const calcium = targetField('Calcium (mg)', 'calcium_mg', 200, 2000, 50);
+  const vitD = targetField('Vitamin D (µg)', 'vitD_ug', 5, 100, 1);
+  const magnesium = targetField('Magnesium (mg)', 'magnesium_mg', 100, 800, 10);
+  const potassium = targetField('Potassium (mg)', 'potassium_mg', 1000, 6000, 100);
+  const iron = targetField('Iron (mg)', 'iron_mg', 5, 45, 1);
+  const omega3 = targetField('Omega-3 (g)', 'omega3_g', 0.5, 5, 0.1);
+
+  return card('Nutrition',
+    el('p', { class: 'card__subtitle' }, 'Full nutrient tracking via the USDA’s online food database. '
+      + 'Only your search terms are sent online — your logs always stay on this device.'),
+    el('div', { class: 'field' },
+      el('label', {}, 'USDA API key'),
+      keyInput,
+      el('span', { class: 'field__hint' },
+        'Free, instant signup: ',
+        el('a', { href: 'https://fdc.nal.usda.gov/api-key-signup.html', target: '_blank', rel: 'noopener' }, 'fdc.nal.usda.gov'),
+        '. Without a key, a shared rate-limited trial key is used.')),
+    el('hr', { class: 'rule' }),
+    el('label', { class: 'row', style: { gap: 'var(--space-2)' } }, onlineLookup, ' Allow online food lookup'),
+    el('span', { class: 'field__hint' }, 'Turn off for local/saved foods only — fully offline and private.'),
+    el('hr', { class: 'rule' }),
+    el('div', { class: 'field', style: { marginBottom: 0 } },
+      el('label', {}, 'Daily nutrient targets'),
+      el('div', { class: 'grid' }, kcal, protein, carb, fat, fiber, sugar, sodium, calcium, vitD, magnesium, potassium, iron, omega3)),
+    el('p', { class: 'field__hint', style: { marginTop: 'var(--space-3)' } },
+      'Targets are general guidance and fully editable — not medical advice.')
+  );
+}
+
 function cameraCard() {
   const c = settings().postureCamera || {};
   const enable = el('input', { type: 'checkbox', checked: !!c.enabled,
@@ -392,6 +447,7 @@ export function init(mountEl) {
     { id: 'appearance', label: 'Appearance', node: appearanceCard() },
     { id: 'reminders', label: 'Reminders', node: remindersCard() },
     { id: 'goals', label: 'Goals', node: goalsCard() },
+    { id: 'nutrition', label: 'Nutrition', node: nutritionCard() },
     { id: 'camera', label: 'Camera', node: cameraCard() },
     { id: 'flare', label: 'Flare', node: flareCard() },
     { id: 'wellbeing', label: 'Wellbeing', node: wellbeingCard() },

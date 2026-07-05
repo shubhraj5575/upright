@@ -17,7 +17,7 @@ function dataset() {
     postureSelfLog: store.get('postureSelfLog'), goalsLog: store.get('goalsLog'),
     exerciseLog: store.get('exerciseLog'), postureCamLog: store.get('postureCamLog'),
     activityLog: store.get('activityLog'), flareLog: store.get('flareLog'),
-    settings: store.get('settings'),
+    settings: store.get('settings'), mealLog: store.get('mealLog'),
   };
 }
 

@@ -65,7 +65,9 @@ function openOnboarding() {
         el('div', { class: 'callout__title' }, 'Seek prompt medical care if you notice'),
         el('p', {}, 'new numbness in the groin/saddle area, leg weakness, or any loss of bladder or bowel control.')),
       el('p', { class: 'field__hint', style: { marginTop: 'var(--space-3)' } },
-        'Everything you log stays in this browser, on this device. Nothing is uploaded, ever.'));
+        'Everything you log stays in this browser, on this device — your logs are never uploaded. ',
+        '(The only thing that ever leaves: the words you type into food search, sent to a public ',
+        'food database to look up nutrition — and only if you use online search.)'));
   }
 
   function stepGoals() {

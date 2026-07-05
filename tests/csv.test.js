@@ -46,6 +46,31 @@ test('list logs expand one row per entry', () => {
   eq(csv.trim().split('\r\n').length, 3, 'header + 2 rows');
 });
 
+test('mealLog flattens modern entries with per-entry nutrient columns', () => {
+  const csv = logToCsv('mealLog', {
+    '2026-07-01': [{
+      t: 'T', meal: 'lunch', name: 'Salmon', grams: 150,
+      nutrients: {
+        kcal: 300, protein_g: 40, carb_g: 0, fat_g: 15, fiber_g: 0, sugar_g: 0,
+        sodium_mg: 80, calcium_mg: 20, vitD_ug: 14, magnesium_mg: 30, potassium_mg: 400, iron_mg: 1, omega3_g: 2.1,
+      },
+      tags: ['omega-3'],
+    }],
+  });
+  const lines = csv.trim().split('\r\n');
+  const header = lines[0];
+  ok(header.includes('meal'), 'header has meal');
+  ok(header.includes('grams'), 'header has grams');
+  ok(header.includes('kcal'), 'header has kcal');
+  ok(header.includes('protein_g'), 'header has protein_g');
+  ok(header.includes('omega3_g'), 'header has omega3_g');
+  const row = lines[1];
+  ok(row.includes('lunch'), 'row has meal');
+  ok(row.includes('150'), 'row has grams');
+  ok(row.includes('300'), 'row has kcal');
+  ok(row.includes('omega-3'), 'row has tags');
+});
+
 test('camera log converts ms to minutes and derives avg score', () => {
   const csv = logToCsv('postureCamLog', {
     '2026-07-01': { monitoredMs: 3600000, goodMs: 2700000, poorMs: 900000, awayMs: 0, slouchEvents: 2, worstStreakMs: 120000, scoreSum: 800, scoreCount: 10, sessions: 1, awayCount: 0 },
